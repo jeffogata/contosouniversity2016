@@ -1,7 +1,7 @@
 $script:project_config = "Release"
 
 properties {
-  
+
   Framework '4.5.1'
 
   $project_name = "ContosoUniversity2016"
@@ -20,6 +20,9 @@ properties {
   Write-Host "**********************************************************************"
 
   $base_dir = Resolve-Path .
+
+  $build_dir = "$base_dir\build"     
+  $source_dir = "$base_dir\src"
 
   $db_scripts_dir = "$base_dir\src\DatabaseMigration"
   $roundhouse_dir = "$base_dir\tools\roundhouse"
@@ -50,10 +53,19 @@ task help {
    exit 0
 }
 
-task InitialPrivateBuild -depends RebuildDatabase
+task InitialPrivateBuild -depends Compile, RebuildDatabase
 
 task RebuildDatabase {
   deploy-database "Rebuild" $connectionString $db_scripts_dir
+}
+
+task Compile -depends Clean { 
+    #exec { & $nuget_exe restore $source_dir\$project_name.sln }
+    exec { msbuild.exe /t:build /v:q /p:Configuration=$project_config /p:Platform="Any CPU" $source_dir\$project_name.sln }
+}
+
+task Clean {
+    exec { msbuild /t:clean /v:q /p:Configuration=$project_config /p:Platform="Any CPU" $source_dir\$project_name.sln }
 }
 
 # --------------------------------------------------------------------------------------------------------------
