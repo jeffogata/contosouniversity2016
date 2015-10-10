@@ -1,0 +1,17 @@
+﻿{
+  "version": "1.0.0-*",
+  "description": "ContosoUniversity.Tests Class Library",
+  "authors": [ "jeffo_000" ],
+  "tags": [ "" ],
+  "projectUrl": "",
+  "licenseUrl": "",
+  "frameworks": {
+    "net46": {
+      "dependencies": {
+        "Fixie": "1.0.0.29",
+        "AutoFixture": "3.36.8",
+        "Respawn": "0.1.0"
+      }
+    }
+  }
+}

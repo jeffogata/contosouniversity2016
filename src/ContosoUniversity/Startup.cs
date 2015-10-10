@@ -6,7 +6,7 @@ using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Http;
 using Microsoft.Framework.DependencyInjection;
 
-namespace ContosoUniversity.Web
+namespace ContosoUniversity
 {
     public class Startup
     {

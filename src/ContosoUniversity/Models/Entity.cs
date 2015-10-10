@@ -1,4 +1,4 @@
-﻿namespace ContosoUniversity.Domain
+﻿namespace ContosoUniversity.Models
 {
     public abstract class Entity
     {

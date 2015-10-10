@@ -1,4 +1,4 @@
-﻿namespace ContosoUniversity.Domain
+﻿namespace ContosoUniversity.Models
 {
     public class Enrollment : Entity
     {

@@ -7,8 +7,8 @@
 
   <Import Project="$(VSToolsPath)\DNX\Microsoft.DNX.Props" Condition="'$(VSToolsPath)' != ''" />
   <PropertyGroup Label="Globals">
-    <ProjectGuid>3ea2832f-e2c3-4e65-b492-3432fbe322d8</ProjectGuid>
-    <RootNamespace>ContosoUniversity.DataAccess.Test</RootNamespace>
+    <ProjectGuid>72bc8fb5-8189-459a-abff-6519f5607f38</ProjectGuid>
+    <RootNamespace>ContosoUniversity.Tests</RootNamespace>
     <BaseIntermediateOutputPath Condition="'$(BaseIntermediateOutputPath)'=='' ">..\artifacts\obj\$(MSBuildProjectName)</BaseIntermediateOutputPath>
     <OutputPath Condition="'$(OutputPath)'=='' ">..\artifacts\bin\$(MSBuildProjectName)\</OutputPath>
   </PropertyGroup>
