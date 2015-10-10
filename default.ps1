@@ -29,7 +29,15 @@ properties {
   $roundhouse_output_dir = "$roundhouse_dir\output"
   $roundhouse_exe_path = "$roundhouse_dir\rh.exe"
   
-  $connectionString = "server=localhost;database=ContosoUniversity2016;trusted_connection=true;"
+  $dev_connection_string_name = "$project_name.ConnectionString"
+  $test_connection_string_name = "$project_name.Tests.ConnectionString"
+
+  $db_server = if ($env:db_server) { $env:db_server } else { "localhost" }
+  $db_name = if ($env:db_name) { $env:db_name } else { "ContosoUniversity2016" }
+  $test_db_name = if ($env:test_db_name) { $env:test_db_name } else { "$db_name.Tests" }
+
+  $dev_connection_string = if(test-path env:$dev_connection_string_name) { (get-item env:$dev_connection_string_name).Value } else { "Server=$db_server;Database=$db_name;Trusted_Connection=True;MultipleActiveResultSets=true" }
+  $test_connection_string = if(test-path env:$test_connection_string_name) { (get-item env:$test_connection_string_name).Value } else { "Server=$db_server;Database=$test_db_name;Trusted_Connection=True;MultipleActiveResultSets=true" }
 
   $application_name = "cu2016"
   $company = "Jeff Ogata"
@@ -37,8 +45,8 @@ properties {
 
 task default -depends InitialPrivateBuild
 task dev -depends DeveloperBuild
-task udb -depends UpdateDatabase
-task rdb -depends RebuildDatabase
+task udb -depends UpdateDatabases
+task rdb -depends RebuildDatabases
 task ? -depends help
 
 task help {
@@ -53,10 +61,25 @@ task help {
    exit 0
 }
 
-task InitialPrivateBuild -depends Compile, RebuildDatabase
+task InitialPrivateBuild -depends SetReleaseBuild, Compile, RebuildDatabases
+task DeveloperBuild -depends SetDebugBuild, Compile, UpdateDatabases
 
-task RebuildDatabase {
-  deploy-database "Rebuild" $connectionString $db_scripts_dir
+task SetDebugBuild {
+    $script:project_config = "Debug"
+}
+
+task SetReleaseBuild {
+    $script:project_config = "Release"
+}
+
+task RebuildDatabases {
+  deploy-database "Rebuild" $dev_connection_string $db_scripts_dir "DEV"
+  deploy-database "Rebuild" $test_connection_string $db_scripts_dir "TEST"
+}
+
+task UpdateDatabases {
+  deploy-database "Update" $dev_connection_string $db_scripts_dir "DEV"
+  deploy-database "Update" $test_connection_string $db_scripts_dir "TEST"
 }
 
 task Compile -depends Clean { 
@@ -106,16 +129,17 @@ function Write-Help-For-Alias($alias,$description) {
 # generalized functions
 # -------------------------------------------------------------------------------------------------------------
 
-function deploy-database($action, $connectionString, $scripts_dir) {
+function deploy-database($action, $connectionString, $scripts_dir, $env) {
     write-host "action: $action"
     write-host "connectionString: $connectionString"
     write-host "scripts_dir: $scripts_dir"
+    write-host "env: $env"
 
     $up_dir = "$scripts_dir\up"
 
     if ($action -eq "Rebuild"){
-       exec { &$roundhouse_exe_path -cs "$connectionString" --commandtimeout=300 --silent -drop -o $roundhouse_output_dir }
+       exec { &$roundhouse_exe_path -cs "$connectionString" --commandtimeout=300 --env $env --silent -drop -o $roundhouse_output_dir }
     }
 
-    exec { &$roundhouse_exe_path -cs "$connectionString" --commandtimeout=300 --up $up_dir --silent -o $roundhouse_output_dir --transaction }
+    exec { &$roundhouse_exe_path -cs "$connectionString" --commandtimeout=300 --env $env --up $up_dir --silent -o $roundhouse_output_dir --transaction }
 }
