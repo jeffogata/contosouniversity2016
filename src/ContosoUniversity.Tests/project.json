@@ -6,12 +6,22 @@
   "projectUrl": "",
   "licenseUrl": "",
   "frameworks": {
-    "net46": {
+    "dnx46": {
       "dependencies": {
-        "Fixie": "1.0.0.29",
         "AutoFixture": "3.36.8",
         "Respawn": "0.1.0"
       }
+    },
+    "dnxcore50": {
+      "dependencies": {
+      }
     }
+  },
+  "dependencies": {
+    "xunit": "2.1.0",
+    "xunit.runner.dnx": "2.1.0-beta5a-build188"
+  },
+  "commands": {
+    "test": "xunit.runner.dnx"
   }
 }
