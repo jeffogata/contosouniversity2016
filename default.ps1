@@ -51,7 +51,7 @@ properties {
 
 task default -depends InitialPrivateBuild
 task dev -depends DeveloperBuild
-task rat -depends RunTests
+task rat -depends Compile, RunTests
 task rdb -depends RebuildDatabases
 task udb -depends UpdateDatabases
 task ? -depends help
@@ -83,16 +83,16 @@ task SetReleaseBuild {
 
 task RebuildDatabases {
   Deploy-Database "Rebuild" $dev_connection_string $db_scripts_dir "DEV"
-  #Deploy-Database "Rebuild" $test_connection_string $db_scripts_dir "TEST"
+  Deploy-Database "Rebuild" $test_connection_string $db_scripts_dir "TEST"
 }
 
 task UpdateDatabases {
   Deploy-Database "Update" $dev_connection_string $db_scripts_dir "DEV"
-  #Deploy-Database "Update" $test_connection_string $db_scripts_dir "TEST"
+  Deploy-Database "Update" $test_connection_string $db_scripts_dir "TEST"
 }
 
 task Compile -depends Clean { 
-    #exec { & $nuget_exe restore $source_dir\$project_name.sln }
+    # exec { & $nuget_exe restore $source_dir\$project_name.sln }   
     Exec { dnu restore }
     Exec { msbuild.exe /t:build /v:q /p:Configuration=$project_config /p:Platform="Any CPU" $source_dir\$project_name.sln }
 }
@@ -177,33 +177,12 @@ function Run-Tests() {
    }
    Get-ChildItem $source -Include $include -Recurse | Copy-Item -Destination $destination
 
-   # run tests
-   # - not able to run Fixie tests at the moment
-   # - also not able to run xunit tests against copied artifacts
-
-   #Run-Fixie "ContosoUniversity.Tests.dll"
+   # run tests - not able to run Fixie tests at the moment
    Run-Xunit
 }
 
 function Run-Xunit() {
+    # not able to run tests against copied artifacts (need to run them on the test project) 
     Exec { dnx -p $source_dir\$test_project_name test }
 }
 
-function Run-Fixie ($test_assembly) {
-   $assembly_to_test = $test_dir + "\" + $test_assembly
-   $results_output = $result_dir + "\" + $test_assembly + ".xml"
-
-   Write-Host "Running Fixie Tests in: $test_assembly"
-   Write-Host "tools\fixie\Fixie.Console.exe $assembly_to_test --NUnitXml $results_output --TeamCity off"
-
-   & tools\fixie\Fixie.Console.exe $assembly_to_test --NUnitXml $results_output --TeamCity off
-
-   if ($lastexitcode -gt 0)
-   {
-       throw "{0} tests in $test_assembly failed." -f $lastexitcode
-   }
-   if ($lastexitcode -lt 0)
-   {
-       throw "$test_assembly run was terminated by a fatal error."
-   }
-}

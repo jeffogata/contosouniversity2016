@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 namespace ContosoUniversity.DataAccess
 {
     using Microsoft.Data.Entity;
+    using Models;
 
     public class ContosoUniversityContext : DbContext
     {
@@ -18,5 +19,7 @@ namespace ContosoUniversity.DataAccess
         {
             base.OnConfiguring(optionsBuilder);
         }
+
+        public DbSet<Department> Departments { get; set; }
     }
 }

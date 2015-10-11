@@ -10,6 +10,6 @@
 
         public DateTime StartDate { get; set; }
 
-        public Instructor Administrator { get; set; }
+        //public Instructor Administrator { get; set; }
     }
 }
