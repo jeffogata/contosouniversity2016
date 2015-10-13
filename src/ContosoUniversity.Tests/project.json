@@ -1,4 +1,4 @@
-﻿{
+{
   "version": "1.0.0-*",
   "description": "ContosoUniversity.Tests Class Library",
   "authors": [ "jeffo_000" ],
@@ -8,18 +8,18 @@
   "frameworks": {
     "dnx46": {
       "dependencies": {
-        "AutoFixture": "3.36.8",
         "Respawn": "0.1.0"
-      }
-    },
-    "dnxcore50": {
-      "dependencies": {
       }
     }
   },
   "dependencies": {
+    "AutoFixture": "3.36.8",
+    "AutoFixture.AutoMoq": "3.36.8",
+    "AutoFixture.Xunit": "3.36.8",
+    "EntityFramework.InMemory": "7.0.0-beta7",
     "xunit": "2.1.0",
-    "xunit.runner.dnx": "2.1.0-beta5a-build188"
+    "xunit.runner.dnx": "2.1.0-beta5a-build188",
+    "ContosoUniversity": "1.0.0"
   },
   "commands": {
     "test": "xunit.runner.dnx"
