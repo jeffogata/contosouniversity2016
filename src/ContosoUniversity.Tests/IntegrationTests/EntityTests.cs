@@ -71,5 +71,21 @@
             Assert.Equal(new DateTime(2014, 8, 21), student.EnrollmentDate);
         }
 
+        [Fact]
+        public void SelectCourseById_ReturnsStudent()
+        {
+            Course course= null;
+
+            using (var db = _fixture.GetDbContext())
+            {
+                course = db.Courses.Include(x => x.Department).Single(x => x.Id == 1);
+            }
+
+            Assert.Equal("60A", course.Number);
+            Assert.Equal("Computer Science I", course.Title);
+            Assert.Equal(3, course.Credits);
+            Assert.Equal(1, course.DepartmentId);
+            Assert.Equal("Engineering", course.Department.Name);
+        }
     }
 }
