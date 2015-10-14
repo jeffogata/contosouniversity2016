@@ -70,6 +70,7 @@ namespace ContosoUniversity.Tests
             var context = ServiceProvider.GetService<ContosoUniversityTestContext>();
 
             context.Database.ExecuteSqlCommand("set identity_insert dbo.Person on; insert dbo.Person(Id, LastName, FirstName, HireDate, EnrollmentDate, Discriminator) values (1, 'Martinez', 'Rick', '2012-05-21', null, 'Instructor'); set identity_insert dbo.Person off;");
+            context.Database.ExecuteSqlCommand("set identity_insert dbo.Person on; insert dbo.Person(Id, LastName, FirstName, HireDate, EnrollmentDate, Discriminator) values (2, 'Watney', 'Mark', null, '2014-08-21', 'Student'); set identity_insert dbo.Person off;");
             context.Database.ExecuteSqlCommand("set identity_insert dbo.Department on; insert dbo.Department(Id, Name, Budget, StartDate, InstructorId) values (1, 'Engineering', 1234567.89, '2010-07-04', 1); set identity_insert dbo.Department off;");
         }
     }

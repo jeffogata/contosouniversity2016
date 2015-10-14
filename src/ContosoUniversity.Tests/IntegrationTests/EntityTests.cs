@@ -55,5 +55,21 @@
             Assert.Equal("Rick", instructor.FirstName);
             Assert.Equal(new DateTime(2012, 5, 21), instructor.HireDate);
         }
+
+        [Fact]
+        public void SelectStudentById_ReturnsStudent()
+        {
+            Student student = null;
+
+            using (var db = _fixture.GetDbContext())
+            {
+                student = db.Students.Single(x => x.Id == 2);
+            }
+
+            Assert.Equal("Watney", student.LastName);
+            Assert.Equal("Mark", student.FirstName);
+            Assert.Equal(new DateTime(2014, 8, 21), student.EnrollmentDate);
+        }
+
     }
 }

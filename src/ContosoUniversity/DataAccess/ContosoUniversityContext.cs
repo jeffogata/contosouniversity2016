@@ -28,6 +28,8 @@ namespace ContosoUniversity.DataAccess
 
         public DbSet<Department> Departments { get; set; }
 
-        public DbSet<Instructor> Instructors { get; set; } 
+        public DbSet<Instructor> Instructors { get; set; }
+
+        public DbSet<Student> Students { get; set; }
     }
 }
