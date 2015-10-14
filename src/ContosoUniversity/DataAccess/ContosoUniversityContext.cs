@@ -12,6 +12,12 @@ namespace ContosoUniversity.DataAccess
     {
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Student>()
+                .BaseType<Person>();
+
+            modelBuilder.Entity<Instructor>()
+                .BaseType<Person>();
+
             base.OnModelCreating(modelBuilder);
         }
 
@@ -21,8 +27,6 @@ namespace ContosoUniversity.DataAccess
         }
 
         public DbSet<Department> Departments { get; set; }
-
-        public DbSet<Person> People { get; set; } 
 
         public DbSet<Instructor> Instructors { get; set; } 
     }

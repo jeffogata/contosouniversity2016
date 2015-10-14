@@ -31,13 +31,14 @@
 
             using (var db = _fixture.GetDbContext())
             {
-                department = db.Departments.Single(x => x.Id == 1);
+                department = db.Departments.Include(x => x.Administrator).Single(x => x.Id == 1);
             }
 
             Assert.Equal("Engineering", department.Name);
             Assert.Equal(1234567.89m, department.Budget);
             Assert.Equal(new DateTime(2010, 7, 4), department.StartDate);
             Assert.Equal(1, department.InstructorId);
+            Assert.Equal(1, department.Administrator.Id);
         }
 
         [Fact]
@@ -51,7 +52,7 @@
             }
 
             Assert.Equal("Martinez", instructor.LastName);
-            Assert.Equal("Rick", instructor.LastName);
+            Assert.Equal("Rick", instructor.FirstName);
             Assert.Equal(new DateTime(2012, 5, 21), instructor.HireDate);
         }
     }

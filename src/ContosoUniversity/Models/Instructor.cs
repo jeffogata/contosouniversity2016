@@ -6,6 +6,6 @@
     {
         public DateTime? HireDate { get; set; }
 
-        public string Office { get; set; }
+        //public string Office { get; set; }
     }
 }
