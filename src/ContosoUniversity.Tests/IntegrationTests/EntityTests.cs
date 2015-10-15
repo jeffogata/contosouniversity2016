@@ -2,6 +2,7 @@
 {
     using System;
     using System.Linq;
+    using Ploeh.AutoFixture;
     using ContosoUniversity.Models;
     using Microsoft.Data.Entity;
     using Xunit;
@@ -9,13 +10,16 @@
     [Collection("DatabaseCollection")]
     public class EntityTests
     {
-        //private readonly IServiceProvider _serviceProvider;
-        private readonly DatabaseFixture _fixture;
+        private readonly DatabaseFixture _dbFixture;
+        private readonly Fixture _autoFixture;
 
-        public EntityTests(DatabaseFixture fixture)
+        public EntityTests(DatabaseFixture dbFixture)
         {
-            _fixture = fixture;
-            _fixture.InitializeData();
+            _dbFixture = dbFixture;
+            _dbFixture.InitializeData();
+
+            _autoFixture = new Fixture();
+            _autoFixture.Behaviors.Add(new OmitOnRecursionBehavior());
         }
 
         [Fact]
@@ -23,7 +27,7 @@
         {
             Department department = null;
 
-            using (var db = _fixture.GetDbContext())
+            using (var db = _dbFixture.GetDbContext())
             {
                 department = db.Departments
                     .Include(x => x.Administrator)
@@ -45,11 +49,60 @@
         }
 
         [Fact]
+        public void AddUpdateDeleteDepartment_SavesChanges()
+        {
+            var department = _autoFixture.Build<Department>()
+                .Without(d => d.Id)
+                .Without(d => d.Administrator)
+                .With(d => d.InstructorId, 1)
+                .Create();
+            
+            using (var db = _dbFixture.GetDbContext())
+            {
+                db.Departments.Add(department);
+                db.SaveChanges();
+
+                var id = department.Id;
+
+                var savedDepartment = db.Departments.Single(x => x.Id == id);
+
+                Assert.Equal(department.Name, savedDepartment.Name);
+                Assert.Equal(department.Budget, savedDepartment.Budget);
+                Assert.Equal(department.StartDate, savedDepartment.StartDate);
+                Assert.Equal(department.InstructorId, savedDepartment.InstructorId);
+
+                var newName = Guid.NewGuid().ToString();
+                var newBudget = savedDepartment.Budget - 1;
+                var newStartDate = savedDepartment.StartDate.AddDays(-1);
+
+                savedDepartment.Name = newName;
+                savedDepartment.Budget = newBudget;
+                savedDepartment.StartDate = newStartDate;
+                savedDepartment.InstructorId = null;
+
+                db.SaveChanges();
+
+                var updatedDepartment = db.Departments.Single(x => x.Id == id);
+
+                Assert.Equal(newName, updatedDepartment.Name);
+                Assert.Equal(newBudget, updatedDepartment.Budget);
+                Assert.Equal(newStartDate, updatedDepartment.StartDate);
+                Assert.Null(updatedDepartment.InstructorId);
+
+                db.Departments.Remove(updatedDepartment);
+
+                db.SaveChanges();
+
+                Assert.Null(db.Departments.SingleOrDefault(x => x.Id == id));
+            }
+        }
+
+        [Fact]
         public void SelectInstructorById_ReturnsInstructor()
         {
             Instructor instructor = null;
 
-            using (var db = _fixture.GetDbContext())
+            using (var db = _dbFixture.GetDbContext())
             {
                 instructor = db.Instructors
                     .Include(x => x.OfficeAssignment)
@@ -67,7 +120,7 @@
         {
             Student student = null;
 
-            using (var db = _fixture.GetDbContext())
+            using (var db = _dbFixture.GetDbContext())
             {
                 student = db.Students
                     .Include(x => x.Enrollments)
@@ -86,7 +139,7 @@
         {
             Course course = null;
 
-            using (var db = _fixture.GetDbContext())
+            using (var db = _dbFixture.GetDbContext())
             {
                 course = db.Courses
                     .Include(x => x.Department)
@@ -122,7 +175,7 @@
         {
             OfficeAssignment office = null;
 
-            using (var db = _fixture.GetDbContext())
+            using (var db = _dbFixture.GetDbContext())
             {
                 office = db.OfficeAssignments
                     .Include(x => x.Instructor)
