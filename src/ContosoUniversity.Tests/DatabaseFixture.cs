@@ -69,13 +69,31 @@ namespace ContosoUniversity.Tests
         {
             var context = ServiceProvider.GetService<ContosoUniversityTestContext>();
 
+            // instructors
             context.Database.ExecuteSqlCommand("set identity_insert dbo.Person on; insert dbo.Person(Id, LastName, FirstName, HireDate, EnrollmentDate, Discriminator) values (1, 'Martinez', 'Rick', '2012-05-21', null, 'Instructor'); set identity_insert dbo.Person off;");
+            context.Database.ExecuteSqlCommand("set identity_insert dbo.Person on; insert dbo.Person(Id, LastName, FirstName, HireDate, EnrollmentDate, Discriminator) values (3, 'Johanssen', 'Beth', '2013-02-19', null, 'Instructor'); set identity_insert dbo.Person off;");
+
+            // students
             context.Database.ExecuteSqlCommand("set identity_insert dbo.Person on; insert dbo.Person(Id, LastName, FirstName, HireDate, EnrollmentDate, Discriminator) values (2, 'Watney', 'Mark', null, '2014-08-21', 'Student'); set identity_insert dbo.Person off;");
+            context.Database.ExecuteSqlCommand("set identity_insert dbo.Person on; insert dbo.Person(Id, LastName, FirstName, HireDate, EnrollmentDate, Discriminator) values (4, 'Vogel', 'Alex', null, '2015-01-11', 'Student'); set identity_insert dbo.Person off;");
+
+            // departments
             context.Database.ExecuteSqlCommand("set identity_insert dbo.Department on; insert dbo.Department(Id, Name, Budget, StartDate, InstructorId) values (1, 'Engineering', 1234567.89, '2010-07-04', 1); set identity_insert dbo.Department off;");
+
+            // courses
             context.Database.ExecuteSqlCommand("set identity_insert dbo.Course on; insert dbo.Course(Id, Number, Title, Credits, DepartmentId) values (1, '60A', 'Computer Science I', 3, 1); set identity_insert dbo.Course off;");
             context.Database.ExecuteSqlCommand("set identity_insert dbo.Course on; insert dbo.Course(Id, Number, Title, Credits, DepartmentId) values (2, '60B', 'Computer Science II', 3, 1); set identity_insert dbo.Course off;");
             context.Database.ExecuteSqlCommand("set identity_insert dbo.Course on; insert dbo.Course(Id, Number, Title, Credits, DepartmentId) values (3, '100A', 'Advanced Algorithms I', 4, 1); set identity_insert dbo.Course off;");
             context.Database.ExecuteSqlCommand("set identity_insert dbo.Course on; insert dbo.Course(Id, Number, Title, Credits, DepartmentId) values (4, '100A', 'Advanced Algorithms II', 4, 1); set identity_insert dbo.Course off;");
+
+            // office assignments
+            context.Database.ExecuteSqlCommand("insert dbo.OfficeAssignment(InstructorId, Location) values (1, '200 Evans Hall')");
+            context.Database.ExecuteSqlCommand("insert dbo.OfficeAssignment(InstructorId, Location) values (2, '100 Cory Hall')");
+
+            // course instructors
+            context.Database.ExecuteSqlCommand("insert dbo.CourseInstructor(CourseId, InstructorId) values (1, 1)");
+            context.Database.ExecuteSqlCommand("insert dbo.CourseInstructor(CourseId, InstructorId) values (3, 1)");
+            context.Database.ExecuteSqlCommand("insert dbo.CourseInstructor(CourseId, InstructorId) values (1, 3)");
         }
     }
 

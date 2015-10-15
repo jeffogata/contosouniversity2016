@@ -48,12 +48,15 @@
 
             using (var db = _fixture.GetDbContext())
             {
-                instructor = db.Instructors.Single(x => x.Id == 1);
+                instructor = db.Instructors
+                    .Include(x => x.OfficeAssignment)
+                    .Single(x => x.Id == 1);
             }
 
             Assert.Equal("Martinez", instructor.LastName);
             Assert.Equal("Rick", instructor.FirstName);
             Assert.Equal(new DateTime(2012, 5, 21), instructor.HireDate);
+            Assert.Equal("200 Evans Hall", instructor.OfficeAssignment.Location);
         }
 
         [Fact]
@@ -72,13 +75,17 @@
         }
 
         [Fact]
-        public void SelectCourseById_ReturnsStudent()
+        public void SelectCourseById_ReturnsCourse()
         {
             Course course= null;
 
             using (var db = _fixture.GetDbContext())
             {
-                course = db.Courses.Include(x => x.Department).Single(x => x.Id == 1);
+                course = db.Courses
+                    .Include(x => x.Department)
+                    //.Include(x => x.CourseInstructors.Select(ci => ci.Instructor))
+                    .Include(x => x.CourseInstructors).ThenInclude(ci => ci.Instructor)     // new syntax!
+                    .Single(x => x.Id == 1);
             }
 
             Assert.Equal("60A", course.Number);
@@ -86,6 +93,28 @@
             Assert.Equal(3, course.Credits);
             Assert.Equal(1, course.DepartmentId);
             Assert.Equal("Engineering", course.Department.Name);
+
+            Assert.Equal(2, course.CourseInstructors.Count);
+            Assert.True(course.CourseInstructors.Any(x => x.Instructor.Id == 1));
+            Assert.True(course.CourseInstructors.Any(x => x.Instructor.Id == 3));
         }
+
+        [Fact]
+        public void SelectOfficeAssignmentById_ReturnsOfficeAssignment()
+        {
+            OfficeAssignment office = null;
+
+            using (var db = _fixture.GetDbContext())
+            {
+                office = db.OfficeAssignments
+                    .Include(x => x.Instructor)
+                    .Single(x => x.InstructorId == 1);
+            }
+
+            Assert.Equal("Martinez", office.Instructor.LastName);
+            Assert.Equal("Rick", office.Instructor.FirstName);
+            Assert.Equal("200 Evans Hall", office.Location);
+        }
+
     }
 }
