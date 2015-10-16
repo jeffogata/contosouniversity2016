@@ -5,10 +5,16 @@ namespace ContosoUniversity.Tests
     using System.Threading;
     using System.Threading.Tasks;
     using ContosoUniversity.DataAccess;
+    using Microsoft.Data.Entity;
+    using Microsoft.Data.Entity.Infrastructure;
 
     public class ContosoUniversityTestContext : ContosoUniversityContext
     {
         public event Action ChangesSaved = delegate { };
+
+        public ContosoUniversityTestContext(DbContextOptions options) : base(options)
+        {
+        }
 
         public override int SaveChanges()
         {

@@ -15,21 +15,18 @@ namespace ContosoUniversity.Tests
 
         public DatabaseFixture()
         {
-            var services = new ServiceCollection();
-
-            services.AddEntityFramework()
-                .AddSqlServer()
-                .AddDbContext<ContosoUniversityTestContext>(options => options.UseSqlServer("Server = localhost; Database = ContosoUniversity2016.Tests; Trusted_Connection = True;"));
-
-            ServiceProvider = services.BuildServiceProvider();
-
             InitializeData();
         }
 
         public ContosoUniversityContext GetDbContext()
         {
-            var context = ServiceProvider.GetService<ContosoUniversityTestContext>();
+            var optionsBuilder = new DbContextOptionsBuilder();
+            optionsBuilder.UseSqlServer("Server = localhost; Database = ContosoUniversity2016.Tests; Trusted_Connection = True;");
+
+            var context = new ContosoUniversityTestContext(optionsBuilder.Options);
+
             context.ChangesSaved += () => _dataChanged = true;
+
             return context;
         }
 
@@ -67,7 +64,7 @@ namespace ContosoUniversity.Tests
 
         private void SeedData()
         {
-            var context = ServiceProvider.GetService<ContosoUniversityTestContext>();
+            var context = GetDbContext();
 
             // instructors
             context.Database.ExecuteSqlCommand("set identity_insert dbo.Person on; insert dbo.Person(Id, LastName, FirstName, HireDate, EnrollmentDate, Discriminator) values (1, 'Martinez', 'Rick', '2012-05-21', null, 'Instructor'); set identity_insert dbo.Person off;");

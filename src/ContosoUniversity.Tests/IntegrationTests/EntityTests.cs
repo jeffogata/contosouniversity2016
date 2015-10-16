@@ -55,6 +55,7 @@
                 .Without(d => d.Id)
                 .Without(d => d.Administrator)
                 .With(d => d.InstructorId, 1)
+                .Without(d => d.Courses)
                 .Create();
             
             using (var db = _dbFixture.GetDbContext())

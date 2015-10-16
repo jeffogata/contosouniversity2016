@@ -16,7 +16,7 @@
         public DateTime StartDate { get; set; }
 
         public int? InstructorId { get; set; }
-
+        
         [Timestamp]
         public byte[] RowVersion { get; set; }
 
