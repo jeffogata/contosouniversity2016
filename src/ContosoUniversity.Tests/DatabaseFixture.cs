@@ -9,7 +9,7 @@ namespace ContosoUniversity.Tests
     using Respawn;
     using Xunit;
 
-    public class DatabaseFixture : IDisposable
+    public class DatabaseFixture
     {
         private bool _dataChanged = true;
 
@@ -28,13 +28,6 @@ namespace ContosoUniversity.Tests
             context.ChangesSaved += () => _dataChanged = true;
 
             return context;
-        }
-
-        public IServiceProvider ServiceProvider { get; private set; }
-       
-        public void Dispose()
-        {
-            // to do:  implement
         }
 
         public void InitializeData()
@@ -76,6 +69,7 @@ namespace ContosoUniversity.Tests
 
             // departments
             context.Database.ExecuteSqlCommand("set identity_insert dbo.Department on; insert dbo.Department(Id, Name, Budget, StartDate, InstructorId) values (1, 'Engineering', 1234567.89, '2010-07-04', 1); set identity_insert dbo.Department off;");
+            context.Database.ExecuteSqlCommand("set identity_insert dbo.Department on; insert dbo.Department(Id, Name, Budget, StartDate, InstructorId) values (2, 'English', 54321.89, '2011-02-03', null); set identity_insert dbo.Department off;");
 
             // courses
             context.Database.ExecuteSqlCommand("set identity_insert dbo.Course on; insert dbo.Course(Id, Number, Title, Credits, DepartmentId) values (1, '60A', 'Computer Science I', 3, 1); set identity_insert dbo.Course off;");

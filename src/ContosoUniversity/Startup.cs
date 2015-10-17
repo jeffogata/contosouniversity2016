@@ -1,23 +1,17 @@
-﻿using System;
-using Microsoft.AspNet.Builder;
-using Microsoft.AspNet.Http;
-using Microsoft.Data.Entity;
-using Microsoft.Framework.Caching.Memory;
-using Microsoft.Framework.DependencyInjection;
-using Microsoft.Framework.Logging;
-
-namespace ContosoUniversity
+﻿namespace ContosoUniversity
 {
     using DataAccess;
+    using Microsoft.AspNet.Builder;
     using Microsoft.AspNet.Hosting;
+    using Microsoft.AspNet.Http;
+    using Microsoft.Data.Entity;
     using Microsoft.Dnx.Runtime;
     using Microsoft.Framework.Configuration;
+    using Microsoft.Framework.DependencyInjection;
     using Models;
 
     public class Startup
     {
-        public IConfiguration Configuration { get; private set; }
-
         public Startup(IHostingEnvironment env, IApplicationEnvironment appEnv)
         {
             var builder = new ConfigurationBuilder()
@@ -28,6 +22,7 @@ namespace ContosoUniversity
             Configuration = builder.Build();
         }
 
+        public IConfiguration Configuration { get; }
         // For more information on how to configure your application, visit http://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
@@ -42,7 +37,7 @@ namespace ContosoUniversity
             // Add the platform handler to the request pipeline.
             app.UseIISPlatformHandler();
 
-            app.Run(async (context) =>
+            app.Run(async context =>
             {
                 Department department = null;
 
@@ -51,7 +46,9 @@ namespace ContosoUniversity
                     department = await db.Departments.FirstOrDefaultAsync();
                 }
 
-                await context.Response.WriteAsync($"Hello {department.Name}! {Configuration["Data:DefaultConnection:ConnectionString"]}");
+                await
+                    context.Response.WriteAsync(
+                        $"Hello {department.Name}! {Configuration["Data:DefaultConnection:ConnectionString"]}");
             });
         }
     }

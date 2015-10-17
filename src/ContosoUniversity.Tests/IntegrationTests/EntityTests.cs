@@ -65,32 +65,32 @@
 
                 var id = department.Id;
 
-                var savedDepartment = db.Departments.Single(x => x.Id == id);
+                var saved = db.Departments.Single(x => x.Id == id);
 
-                Assert.Equal(department.Name, savedDepartment.Name);
-                Assert.Equal(department.Budget, savedDepartment.Budget);
-                Assert.Equal(department.StartDate, savedDepartment.StartDate);
-                Assert.Equal(department.InstructorId, savedDepartment.InstructorId);
+                Assert.Equal(department.Name, saved.Name);
+                Assert.Equal(department.Budget, saved.Budget);
+                Assert.Equal(department.StartDate, saved.StartDate);
+                Assert.Equal(department.InstructorId, saved.InstructorId);
 
                 var newName = Guid.NewGuid().ToString();
-                var newBudget = savedDepartment.Budget - 1;
-                var newStartDate = savedDepartment.StartDate.AddDays(-1);
+                var newBudget = saved.Budget - 1;
+                var newStartDate = saved.StartDate.AddDays(-1);
 
-                savedDepartment.Name = newName;
-                savedDepartment.Budget = newBudget;
-                savedDepartment.StartDate = newStartDate;
-                savedDepartment.InstructorId = null;
+                saved.Name = newName;
+                saved.Budget = newBudget;
+                saved.StartDate = newStartDate;
+                saved.InstructorId = null;
 
                 db.SaveChanges();
 
-                var updatedDepartment = db.Departments.Single(x => x.Id == id);
+                var updated = db.Departments.Single(x => x.Id == id);
 
-                Assert.Equal(newName, updatedDepartment.Name);
-                Assert.Equal(newBudget, updatedDepartment.Budget);
-                Assert.Equal(newStartDate, updatedDepartment.StartDate);
-                Assert.Null(updatedDepartment.InstructorId);
+                Assert.Equal(newName, updated.Name);
+                Assert.Equal(newBudget, updated.Budget);
+                Assert.Equal(newStartDate, updated.StartDate);
+                Assert.Null(updated.InstructorId);
 
-                db.Departments.Remove(updatedDepartment);
+                db.Departments.Remove(updated);
 
                 db.SaveChanges();
 
@@ -117,6 +117,52 @@
         }
 
         [Fact]
+        public void AddUpdateDeleteInstructor_SavesChanges()
+        {
+            var instructor = _autoFixture.Build<Instructor>()
+                .Without(i => i.Id)
+                .Without(i => i.CourseInstructors)
+                .Without(i => i.OfficeAssignment)
+                .Create();
+
+            using (var db = _dbFixture.GetDbContext())
+            {
+                db.Instructors.Add(instructor);
+                db.SaveChanges();
+
+                var id = instructor.Id;
+
+                var saved = db.Instructors.Single(x => x.Id == id);
+
+                Assert.Equal(instructor.FirstName, saved.FirstName);
+                Assert.Equal(instructor.LastName, saved.LastName);
+                Assert.Equal(instructor.HireDate, saved.HireDate);
+
+                var newFirstName = Guid.NewGuid().ToString();
+                var newLastName = Guid.NewGuid().ToString();
+                var newHireDate = (DateTime?)saved.HireDate.Value.AddDays(-1);
+
+                saved.FirstName = newFirstName;
+                saved.LastName = newLastName;
+                saved.HireDate = newHireDate;
+
+                db.SaveChanges();
+
+                var updated = db.Instructors.Single(x => x.Id == id);
+
+                Assert.Equal(newFirstName, updated.FirstName);
+                Assert.Equal(newLastName, updated.LastName);
+                Assert.Equal(newHireDate, updated.HireDate);
+
+                db.Instructors.Remove(updated);
+
+                db.SaveChanges();
+
+                Assert.Null(db.Instructors.SingleOrDefault(x => x.Id == id));
+            }
+        }
+
+        [Fact]
         public void SelectStudentById_ReturnsStudent()
         {
             Student student = null;
@@ -136,6 +182,51 @@
         }
 
         [Fact]
+        public void AddUpdateDeleteStudent_SavesChanges()
+        {
+            var student = _autoFixture.Build<Student>()
+                .Without(x => x.Id)
+                .Without(x => x.Enrollments)
+                .Create();
+
+            using (var db = _dbFixture.GetDbContext())
+            {
+                db.Students.Add(student);
+                db.SaveChanges();
+
+                var id = student.Id;
+
+                var saved = db.Students.Single(x => x.Id == id);
+
+                Assert.Equal(student.FirstName, saved.FirstName);
+                Assert.Equal(student.LastName, saved.LastName);
+                Assert.Equal(student.EnrollmentDate, saved.EnrollmentDate);                
+
+                var newFirstName = Guid.NewGuid().ToString();
+                var newLastName = Guid.NewGuid().ToString();
+                var newHireDate = (DateTime?)saved.EnrollmentDate.Value.AddDays(-1);
+
+                saved.FirstName = newFirstName;
+                saved.LastName = newLastName;
+                saved.EnrollmentDate = newHireDate;
+
+                db.SaveChanges();
+
+                var updated = db.Students.Single(x => x.Id == id);
+
+                Assert.Equal(newFirstName, updated.FirstName);
+                Assert.Equal(newLastName, updated.LastName);
+                Assert.Equal(newHireDate, updated.EnrollmentDate);
+
+                db.Students.Remove(updated);
+
+                db.SaveChanges();
+
+                Assert.Null(db.Students.SingleOrDefault(x => x.Id == id));
+            }
+        }
+
+        [Fact]
         public void SelectCourseById_ReturnsCourse()
         {
             Course course = null;
@@ -144,8 +235,7 @@
             {
                 course = db.Courses
                     .Include(x => x.Department)
-                    //.Include(x => x.CourseInstructors.Select(ci => ci.Instructor))
-                    .Include(x => x.CourseInstructors).ThenInclude(ci => ci.Instructor) // new syntax!
+                    .Include(x => x.CourseInstructors).ThenInclude(ci => ci.Instructor) // new syntax! old syntax -> //.Include(x => x.CourseInstructors.Select(ci => ci.Instructor))
                     .Include(x => x.Enrollments).ThenInclude(e => e.Student)
                     .Single(x => x.Id == 1);
             }
@@ -172,6 +262,59 @@
         }
 
         [Fact]
+        public void AddUpdateDeleteCourse_SavesChanges()
+        {
+            var course = _autoFixture.Build<Course>()
+                .Without(x => x.Id)
+                .Without(x => x.Department)
+                .Without(x => x.CourseInstructors)
+                .Without(x => x.Enrollments)
+                .With(x => x.DepartmentId, 1)
+                .With(x => x.Number, "abcde")
+                .Create();
+
+            using (var db = _dbFixture.GetDbContext())
+            {
+                db.Courses.Add(course);
+                db.SaveChanges();
+
+                var id = course.Id;
+
+                var saved = db.Courses.Single(x => x.Id == id);
+
+                Assert.Equal(course.Number, saved.Number);
+                Assert.Equal(course.Title, saved.Title);
+                Assert.Equal(course.Credits, saved.Credits);
+                Assert.Equal(course.DepartmentId, saved.DepartmentId);
+
+                var newNumber = "vwxyz";
+                var newTitle = Guid.NewGuid().ToString();
+                var newCredits = saved.Credits + 1;
+                var newDepartmentId = 2;
+
+                saved.Number = newNumber;
+                saved.Title = newTitle;
+                saved.Credits = newCredits;
+                saved.DepartmentId = newDepartmentId;
+
+                db.SaveChanges();
+
+                var updated = db.Courses.Single(x => x.Id == id);
+
+                Assert.Equal(newNumber, updated.Number);
+                Assert.Equal(newTitle, updated.Title);
+                Assert.Equal(newCredits, updated.Credits);
+                Assert.Equal(newDepartmentId, updated.DepartmentId);
+
+                db.Courses.Remove(updated);
+
+                db.SaveChanges();
+
+                Assert.Null(db.Courses.SingleOrDefault(x => x.Id == id));
+            }
+        }
+
+        [Fact]
         public void SelectOfficeAssignmentById_ReturnsOfficeAssignment()
         {
             OfficeAssignment office = null;
@@ -186,6 +329,43 @@
             Assert.Equal("Martinez", office.Instructor.LastName);
             Assert.Equal("Rick", office.Instructor.FirstName);
             Assert.Equal("200 Evans Hall", office.Location);
+        }
+
+        [Fact]
+        public void AddUpdateDeleteOfficeAssigment_SavesChanges()
+        {
+            var instructorId = 3;
+
+            var office = _autoFixture.Build<OfficeAssignment>()
+                .With(x => x.InstructorId, instructorId)
+                .Without(x => x.Instructor)
+                .Create();
+
+            using (var db = _dbFixture.GetDbContext())
+            {
+                db.OfficeAssignments.Add(office);
+                db.SaveChanges();
+
+                var saved = db.OfficeAssignments.Single(x => x.InstructorId == instructorId);
+
+                Assert.Equal(office.Location, saved.Location);
+
+                var newLocation = Guid.NewGuid().ToString();
+
+                saved.Location = newLocation;
+
+                db.SaveChanges();
+
+                var updated = db.OfficeAssignments.Single(x => x.InstructorId == instructorId);
+
+                Assert.Equal(newLocation, updated.Location);
+
+                db.OfficeAssignments.Remove(updated);
+
+                db.SaveChanges();
+
+                Assert.Null(db.OfficeAssignments.SingleOrDefault(x => x.InstructorId == instructorId));
+            }
         }
     }
 }
