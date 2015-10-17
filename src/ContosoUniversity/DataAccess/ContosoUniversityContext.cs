@@ -29,11 +29,6 @@
             base.OnModelCreating(modelBuilder);
         }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            base.OnConfiguring(optionsBuilder);
-        }
-
         public DbSet<Course> Courses { get; set; }
 
         public DbSet<Department> Departments { get; set; }
