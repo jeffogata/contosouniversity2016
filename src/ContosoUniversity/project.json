@@ -1,7 +1,7 @@
 {
   "webroot": "wwwroot",
   "version": "1.0.0-*",
-
+  
   "dependencies": {
     "EntityFramework.SqlServer": "7.0.0-beta8",
     "EntityFramework.SqlServer.Design": "7.0.0-beta8",

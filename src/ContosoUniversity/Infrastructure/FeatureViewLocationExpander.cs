@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace ContosoUniversity.Infrastructure
+﻿namespace ContosoUniversity.Infrastructure
 {
+    using System.Collections.Generic;
+    using System.Linq;
     using Microsoft.AspNet.Mvc.Razor;
 
     public class FeatureViewLocationExpander : IViewLocationExpander
@@ -14,7 +11,8 @@ namespace ContosoUniversity.Infrastructure
             // nothing to do here
         }
 
-        public IEnumerable<string> ExpandViewLocations(ViewLocationExpanderContext context, IEnumerable<string> viewLocations)
+        public IEnumerable<string> ExpandViewLocations(ViewLocationExpanderContext context,
+            IEnumerable<string> viewLocations)
         {
             return viewLocations.Select(x => x.Replace("/Views/", "/Features/"));
         }

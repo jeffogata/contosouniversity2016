@@ -1,8 +1,8 @@
-﻿namespace ContosoUniversity.Controllers
+﻿namespace ContosoUniversity.Features.Home
 {
     using Microsoft.AspNet.Mvc;
 
-    public class HomeController : Controller
+    public class _Controller : Controller
     {
         public IActionResult Index()
         {

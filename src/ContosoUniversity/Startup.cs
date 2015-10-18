@@ -1,11 +1,14 @@
 ﻿namespace ContosoUniversity
 {
     using System;
+    using System.Linq;
+    using System.Runtime.InteropServices.ComTypes;
     using DataAccess;
     using Infrastructure;
     using Microsoft.AspNet.Builder;
     using Microsoft.AspNet.Hosting;
     using Microsoft.AspNet.Http;
+    using Microsoft.AspNet.Mvc.Controllers;
     using Microsoft.AspNet.Mvc.Razor;
     using Microsoft.Data.Entity;
     using Microsoft.Dnx.Runtime;
@@ -36,7 +39,10 @@
                     options.UseSqlServer(Configuration["Data:DefaultConnection:ConnectionString"]));
 
             services
-                .AddMvc();
+                .AddMvc(options =>
+                {
+                    options.Conventions.Add(new FeatureApplicationModelConvention());
+                });
 
             services.Configure<RazorViewEngineOptions>(options =>
             {
@@ -76,6 +82,10 @@
                 // routes.MapWebApiRoute("DefaultApi", "api/{controller}/{id?}");
             });
 
+            app.Run(async context =>
+            {
+                await context.Response.WriteAsync("<h1>Not Found</h1>");
+            });
             //app.Run(async context =>
             //{
             //    Department department = null;
