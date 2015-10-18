@@ -9,7 +9,7 @@
         {
             foreach (var controller in application.Controllers.Where(x => x.ControllerName == "_"))
             {
-                var name = controller.ControllerType.AsType()?.Namespace?.Split().Last();
+                var name = controller.ControllerType.AsType()?.Namespace?.Split('.').Last();
 
                 if (name != null)
                 {
