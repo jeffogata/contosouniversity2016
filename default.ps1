@@ -104,7 +104,9 @@ task Clean {
     #    "Errors in D:\Projects\ContosoUniversity2016\src\artifacts\bin\ContosoUniversity.Tests\Debug\app\project.json"
     #    "Unable to locate ContosoUniversity.Tests >= 1.0.0"
 
-    Remove-Item $source_dir\artifacts -Force -Recurse
+    If (Test-Path $source_dir\artifact){
+        Remove-Item $source_dir\artifacts -Force -Recurse
+    }
     Exec { msbuild /t:clean /v:q /p:Configuration=$project_config /p:Platform="Any CPU" $source_dir\$project_name.sln }
 }
 
