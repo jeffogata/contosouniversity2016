@@ -44,11 +44,12 @@
                     options.Conventions.Add(new FeatureApplicationModelConvention());
                 });
 
-            services.Configure<RazorViewEngineOptions>(options =>
-            {
-                options.ViewLocationExpanders.Clear();
-                options.ViewLocationExpanders.Add(new FeatureViewLocationExpander());
-            });
+            services
+                .Configure<RazorViewEngineOptions>(options =>
+                {
+                    options.ViewLocationExpanders.Clear();
+                    options.ViewLocationExpanders.Add(new FeatureViewLocationExpander());
+                });
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -82,6 +83,7 @@
                 // routes.MapWebApiRoute("DefaultApi", "api/{controller}/{id?}");
             });
 
+            
             app.Run(async context =>
             {
                 await context.Response.WriteAsync("<h1>Not Found</h1>");

@@ -220,3 +220,6 @@ _Pvt_Extensions
 
 # VS Code
 Code
+
+# ASP.NET 5
+**/wwwroot/lib/
