@@ -33,7 +33,7 @@
         public void ConfigureServices(IServiceCollection services)
         {
             services
-                .AddEntityFramework()
+                .AddEntityFramework()               
                 .AddSqlServer()
                 .AddDbContext<ContosoUniversityContext>(options =>
                     options.UseSqlServer(Configuration["Data:DefaultConnection:ConnectionString"]));

@@ -15,5 +15,12 @@
 
             return View();
         }
+
+        public ActionResult Contact()
+        {
+            ViewData["Message"] = "Your contact page.";
+
+            return View();
+        }
     }
 }
