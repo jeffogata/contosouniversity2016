@@ -2,9 +2,11 @@
 {
     using System;
     using System.Linq;
+    using System.Runtime.InteropServices;
     using System.Runtime.InteropServices.ComTypes;
     using DataAccess;
     using Infrastructure;
+    using Mapping;
     using Microsoft.AspNet.Builder;
     using Microsoft.AspNet.Hosting;
     using Microsoft.AspNet.Http;
@@ -18,7 +20,7 @@
 
     public class Startup
     {
-        public Startup(IHostingEnvironment env, IApplicationEnvironment appEnv)
+        public Startup(IHostingEnvironment env, IApplicationEnvironment appEnv, IServiceProvider serviceProvider, ILibraryManager libraryManager)
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(appEnv.ApplicationBasePath)
@@ -26,6 +28,9 @@
                 .AddEnvironmentVariables();
 
             Configuration = builder.Build();
+
+            var autoMapperBuilder = new AutoMapperBuilder()
+                .AddProfiles(serviceProvider, libraryManager);
         }
 
         public IConfiguration Configuration { get; }
@@ -50,6 +55,8 @@
                     options.ViewLocationExpanders.Clear();
                     options.ViewLocationExpanders.Add(new FeatureViewLocationExpander());
                 });
+           
+
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -83,7 +90,7 @@
                 // routes.MapWebApiRoute("DefaultApi", "api/{controller}/{id?}");
             });
 
-            
+
             app.Run(async context =>
             {
                 await context.Response.WriteAsync("<h1>Not Found</h1>");
@@ -92,17 +99,18 @@
             //{
             //    Department department = null;
 
-            //    //using (var db = context.ApplicationServices.GetRequiredService<ContosoUniversityContext>())
-            //    //{
-            //    //    //department = await db.Departments.FirstOrDefaultAsync();
-            //    //}
+            //    using (var serviceScope = context.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
+            //    using (var db = serviceScope.ServiceProvider.GetService<ContosoUniversityContext>())
+            //    {
+            //        department = await db.Departments.FirstOrDefaultAsync();
+            //    }
 
-            //    //await
-            //    //    context.Response.WriteAsync(
-            //    //        $"Hello {department.Name}! {Configuration["Data:DefaultConnection:ConnectionString"]}");
             //    await
             //        context.Response.WriteAsync(
-            //            $"Hello {Configuration["Data:DefaultConnection:ConnectionString"]}");
+            //            $"Hello {department?.Name}! {Configuration["Data:DefaultConnection:ConnectionString"]}");
+            //    //await
+            //    //    context.Response.WriteAsync(
+            //    //        $"Hello {Configuration["Data:DefaultConnection:ConnectionString"]}");
             //});
         }
     }
