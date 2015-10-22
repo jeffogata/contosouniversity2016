@@ -20,7 +20,7 @@
 
     public class Startup
     {
-        public Startup(IHostingEnvironment env, IApplicationEnvironment appEnv, IServiceProvider serviceProvider, ILibraryManager libraryManager)
+        public Startup(IHostingEnvironment env, IApplicationEnvironment appEnv)
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(appEnv.ApplicationBasePath)
@@ -28,9 +28,6 @@
                 .AddEnvironmentVariables();
 
             Configuration = builder.Build();
-
-            var autoMapperBuilder = new AutoMapperBuilder()
-                .AddProfiles(serviceProvider, libraryManager);
         }
 
         public IConfiguration Configuration { get; }
@@ -55,23 +52,24 @@
                     options.ViewLocationExpanders.Clear();
                     options.ViewLocationExpanders.Add(new FeatureViewLocationExpander());
                 });
-           
-
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseBrowserLink();
-                app.UseDeveloperExceptionPage();
-            }
-            else
+            //if (env.IsDevelopment())
+            //{
+            //    app.UseBrowserLink();
+            //    app.UseDeveloperExceptionPage();
+            //}
+            //else
             //{
             //    // Add Error handling middleware which catches all application specific errors and
             //    // send the request to the following path or controller action.
             //    app.UseExceptionHandler("/Home/Error");
             //}
+
+            // bootstrap AutoMapper
+            app.UseAutoMapper();
 
             // Add the platform handler to the request pipeline.
             app.UseIISPlatformHandler();
