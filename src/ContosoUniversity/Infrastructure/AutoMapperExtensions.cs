@@ -10,7 +10,7 @@
 
     public static class AutoMapperBuilder
     {
-        public static void UseAutoMapper(this IApplicationBuilder app)
+        public static IApplicationBuilder ConfigureAutoMapper(this IApplicationBuilder app)
         {
             var services = app.ApplicationServices;
             var libraryManager = services.GetService<ILibraryManager>();
@@ -35,6 +35,8 @@
 
                 cfg.ConstructServicesUsing(services.GetService);
             });
+
+            return app;
         }
     }
 }

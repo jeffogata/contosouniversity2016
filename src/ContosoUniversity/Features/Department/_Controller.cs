@@ -10,9 +10,9 @@
     {
         private readonly IMediator _mediator;
 
-        public _Controller(IServiceProvider services)
+        public _Controller(IMediator mediator)
         {
-            _mediator = new Mediator(services.GetService, services.GetServices);
+            _mediator = mediator;
         }
 
         public async Task<IActionResult> Index()

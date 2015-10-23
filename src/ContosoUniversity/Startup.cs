@@ -49,14 +49,14 @@
                 });
 
             services
+                .AddMediatR();
+
+            services
                 .Configure<RazorViewEngineOptions>(options =>
                 {
                     options.ViewLocationExpanders.Clear();
                     options.ViewLocationExpanders.Add(new FeatureViewLocationExpander());
                 });
-
-            services.AddScoped(typeof(IAsyncRequestHandler<Features.Course.Index.Query, Features.Course.Index.Result>), typeof(Features.Course.Index.Handler));
-            services.AddScoped(typeof(IAsyncRequestHandler<Features.Department.Index.Query, List<Features.Department.Index.Model>>), typeof(Features.Department.Index.QueryHandler));
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -74,7 +74,7 @@
             //}
 
             // bootstrap AutoMapper
-            app.UseAutoMapper();
+            app.ConfigureAutoMapper();
 
             // Add the platform handler to the request pipeline.
             app.UseIISPlatformHandler();
