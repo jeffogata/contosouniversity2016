@@ -5,8 +5,10 @@
     using System.Runtime.InteropServices;
     using System.Runtime.InteropServices.ComTypes;
     using DataAccess;
+    using Features.Course;
     using Infrastructure;
     using Mapping;
+    using MediatR;
     using Microsoft.AspNet.Builder;
     using Microsoft.AspNet.Hosting;
     using Microsoft.AspNet.Http;
@@ -52,6 +54,8 @@
                     options.ViewLocationExpanders.Clear();
                     options.ViewLocationExpanders.Add(new FeatureViewLocationExpander());
                 });
+
+            services.AddScoped(typeof(IAsyncRequestHandler<Index.Query, Index.Result>), typeof(Index.Handler));
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)

@@ -1,15 +1,48 @@
-﻿@{
+﻿@model ContosoUniversity.Features.Course.Index.Result
+@{
     ViewData["Title"] = "Course Index";
 }
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - CU 2016</title>
-</head>
-<body>
-    <h2>@ViewData["Title"]</h2>
-    <p>Use this area to provide course information.</p>
-</body>
-</html>
+
+<h2>@ViewData["Title"]</h2>
+
+<table class="table">
+    <tr>
+        <th>
+            Number
+        </th>
+        <th>
+            Title
+        </th>
+        <th>
+            Credits
+        </th>
+        <th>
+            Department
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model.Courses)
+    {
+        <tr>
+            <td>
+                @item.Number
+            </td>
+            <td>
+                @item.Title
+            </td>
+            <td>
+                @item.Credits
+            </td>
+            <td>
+                @item.DepartmentName
+            </td>
+            <td>
+                <a href="">Edit</a>
+                <a href="">Details</a>
+                <a href="">Delete</a>
+            </td>
+        </tr>
+    }
+
+</table>
