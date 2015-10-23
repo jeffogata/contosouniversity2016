@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using ContosoUniversity.Models;
-using MediatR;
-
-namespace ContosoUniversity.Features.Course
+﻿namespace ContosoUniversity.Features.Course
 {
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
     using AutoMapper.QueryableExtensions;
     using DataAccess;
+    using MediatR;
     using Microsoft.Data.Entity;
+    using Models;
 
     public class Index
     {
@@ -44,7 +42,7 @@ namespace ContosoUniversity.Features.Course
 
             public async Task<Result> Handle(Query message)
             {
-                int? departmentId = message.SelectedDepartment?.Id;
+                var departmentId = message.SelectedDepartment?.Id;
 
                 var courses = await _db.Courses
                     .Where(c => !departmentId.HasValue || c.DepartmentId == departmentId)

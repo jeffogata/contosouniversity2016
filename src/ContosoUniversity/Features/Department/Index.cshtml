@@ -1,0 +1,48 @@
+﻿@using ContosoUniversity.Features.Department
+@model IList<Index.Model>
+@{
+    ViewData["Title"] = "Departments";
+}
+<h2>Departments</h2>
+<p>
+    <a href="">Create New</a>
+</p>
+<table class="table">
+    <tr>
+        <th>
+            Name
+        </th>
+        <th>
+            Budget
+        </th>
+        <th>
+            Start Date
+        </th>
+        <th>
+            Administrator
+        </th>
+        <th></th>
+    </tr>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @item.Name
+            </td>
+            <td>
+                @item.Budget
+            </td>
+            <td>
+                @item.StartDate
+            </td>
+            <td>
+                @item.AdministratorFullName
+            </td>
+            <td>
+                <a href="">Edit</a>
+                <a href="">Details</a>
+                <a href="">Delete</a>
+            </td>
+        </tr>
+    }
+</table>
