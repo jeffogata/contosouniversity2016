@@ -1,0 +1,116 @@
+﻿@using ContosoUniversity.Features.Instructor
+@model  Index.Model
+
+@{
+    ViewData["Title"] = "Instructors";
+}
+
+<h2>Instructors</h2>
+
+<p>
+    <a href="">Create New</a>
+</p>
+<table class="table">
+    <tr>
+        <th>Last Name</th>
+        <th>First Name</th>
+        <th>Hire Date</th>
+        <th>Office</th>
+        <th>Courses</th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model.Instructors)
+    {
+        string selectedRow = "";
+        if (item.Id == Model.InstructorId)
+        {
+            selectedRow = "success";
+        }
+        <tr class="@selectedRow">
+            <td>
+                @item.LastName
+            </td>
+            <td>
+                @item.FirstName
+            </td>
+            <td>
+                @item.HireDate
+            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+
+            <td>
+                <a href="">Select</a>
+                <a href="">Edit</a>
+                <a href="">Details</a>
+                <a href="">Delete</a>
+            </td>
+        </tr>
+    }
+
+</table>
+
+@if (Model.Courses.Any())
+{
+    <h3>Courses Taught by Selected Instructor</h3>
+    <table class="table">
+        <tr>
+            <th></th>
+            <th>Number</th>
+            <th>Title</th>
+            <th>Department</th>
+        </tr>
+
+        @foreach (var item in Model.Courses)
+        {
+            string selectedRow = "";
+            if (item.CourseId == Model.CourseId)
+            {
+                selectedRow = "success";
+            }
+            <tr class="@selectedRow">
+                <td>
+                    <a href="">Select</a>
+                </td>
+                <td>
+                    @item.CourseId
+                </td>
+                <td>
+                    @item.Title
+                </td>
+                <td>
+                    @item.DepartmentName
+                </td>
+            </tr>
+        }
+
+    </table>
+}
+
+@if (Model.Enrollments.Any())
+{
+    <h3>
+        Students Enrolled in Selected Course
+    </h3>
+    <table class="table">
+        <tr>
+            <th>Name</th>
+            <th>Grade</th>
+        </tr>
+
+        @foreach (var item in Model.Enrollments)
+        {
+            <tr>
+                <td>
+                    @item.StudentFullName
+                </td>
+                <td>
+                    @item.Grade
+                </td>
+            </tr>
+        }
+    </table>
+}

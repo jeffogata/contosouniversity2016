@@ -1,0 +1,56 @@
+﻿@model Index.Result
+@using ContosoUniversity.Features.Student;
+@using PagedList.Mvc;
+
+@{
+    ViewData["Title"] = "Students";
+}
+
+<h2>Students</h2>
+
+<p>
+    <a href="">Create New</a>
+</p>
+<form method="GET">
+    <p>
+        Find by name: 
+        <input type="submit" value="Search" />
+    </p>
+</form>
+<table class="table">
+    <tr>
+        <th>
+            Last Name
+        </th>
+        <th>
+            First Name
+        </th>
+        <th>
+            Enrollment Date
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model.Results)
+    {
+        <tr>
+            <td>
+                @item.LastName
+            </td>
+            <td>
+                @item.FirstName
+            </td>
+            <td>
+                @item.EnrollmentDate
+            </td>
+            <td>
+                <a href="">Edit</a>
+                <a href="">Details</a>
+                <a href="">Delete</a>
+            </td>
+        </tr>
+    }
+
+</table>
+<br />
+    Page @(Model.Results.PageCount < Model.Results.PageNumber ? 0 : Model.Results.PageNumber) of @Model.Results.PageCount

@@ -21,15 +21,27 @@
                 .SelectMany(l => l.Assemblies)
                 .Select(Assembly.Load);
 
-            var handlerTypes = assemblies
+            var asyncHandlerTypes = assemblies
                 .SelectMany(a => a.DefinedTypes)
                 .Where(typeInfo => typeInfo.GetInterfaces().Any(x =>
                     x.IsGenericType && x.GetGenericTypeDefinition() == typeof (IAsyncRequestHandler<,>)));
 
-            foreach (var type in handlerTypes)
+            foreach (var type in asyncHandlerTypes)
             {
                 var interfaceType =
                     type.GetInterfaces().First(x => x.GetGenericTypeDefinition() == typeof (IAsyncRequestHandler<,>));
+                services.AddScoped(interfaceType, type);
+            }
+
+            var handlerTypes = assemblies
+                .SelectMany(a => a.DefinedTypes)
+                .Where(typeInfo => typeInfo.GetInterfaces().Any(x =>
+                    x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IRequestHandler<,>)));
+
+            foreach (var type in handlerTypes)
+            {
+                var interfaceType =
+                    type.GetInterfaces().First(x => x.GetGenericTypeDefinition() == typeof(IRequestHandler<,>));
                 services.AddScoped(interfaceType, type);
             }
 
