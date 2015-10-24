@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 namespace ContosoUniversity.Features.Student
 {
+    using AutoMapper;
     using AutoMapper.QueryableExtensions;
     using System.ComponentModel.DataAnnotations;
     using DataAccess;
@@ -96,7 +97,11 @@ namespace ContosoUniversity.Features.Student
 
                 int pageSize = 3;
                 int pageNumber = (message.Page ?? 1);
-                model.Results = students.ProjectTo<Model>().ToPagedList(pageNumber, pageSize);
+
+
+                // problems using ProjectTo on Person/Student hierarchy
+                var mapped = Mapper.Map<List<Model>>(students.ToList());
+                model.Results = mapped.AsQueryable().ToPagedList(pageNumber, pageSize);
 
                 return model;
             }

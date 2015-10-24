@@ -21,9 +21,11 @@
 
             return View(model);
         }
-        public ActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            return View(new Create.Command());
+            var model = await _mediator.SendAsync(new Create.Query());
+
+            return View(model);
         }
 
         [HttpPost]

@@ -5,8 +5,10 @@
     using System.ComponentModel.DataAnnotations;
     using System.Linq;
     using System.Threading.Tasks;
+    using AutoMapper;
     using AutoMapper.QueryableExtensions;
     using DataAccess;
+    using Mapping;
     using MediatR;
     using Microsoft.Data.Entity;
     using Models;
@@ -78,10 +80,10 @@
 
             public async Task<Model> Handle(Query message)
             {
-                var instructors = await _db.Instructors
+                var instructors = 
+                    Mapper.Map<List<Model.Instructor>>(await _db.Instructors
                     .OrderBy(i => i.LastName)
-                    .ProjectTo<Model.Instructor>()
-                    .ToListAsync();
+                    .ToListAsync());
 
                 var courses = new List<Model.Course>();
                 var enrollments = new List<Model.Enrollment>();

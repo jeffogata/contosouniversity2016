@@ -3,14 +3,11 @@
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
-    using System.Linq;
     using System.Threading.Tasks;
-    using AutoMapper.QueryableExtensions;
     using AutoMapper;
     using DataAccess;
     using MediatR;
     using Microsoft.Data.Entity;
-    using Models;
 
     public class Index
     {
@@ -21,13 +18,9 @@
         public class Model
         {
             public int Id { get; set; }
-
             public string Name { get; set; }
-
             public decimal Budget { get; set; }
-
             public DateTime StartDate { get; set; }
-
             //public Administrator Administrator { get; set; }
             public string AdministratorFullName { get; set; }
         }
@@ -35,7 +28,7 @@
         public class Administrator
         {
             [Display(Name = "Administrator")]
-            public string FullName { get; set; }    
+            public string FullName { get; set; }
         }
 
         public class QueryHandler : IAsyncRequestHandler<Query, List<Model>>
@@ -64,9 +57,9 @@
                 */
 
                 var departments = await _context
-                        .Departments
-                        .Include(x => x.Administrator)
-                        .ToListAsync();
+                    .Departments
+                    .Include(x => x.Administrator)
+                    .ToListAsync();
 
                 return Mapper.Map<List<Model>>(departments);
             }

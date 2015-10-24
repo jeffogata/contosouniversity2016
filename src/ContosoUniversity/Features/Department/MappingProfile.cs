@@ -8,6 +8,7 @@
         protected override void Configure()
         {
             CreateMap<Instructor, Index.Administrator>();
+            CreateMap<Instructor, Create.Instructor>();
             CreateMap<Department, Index.Model>();
             CreateMap<Create.Command, Department>();
         }

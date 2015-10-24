@@ -1,7 +1,7 @@
-﻿@model ContosoUniversity.Features.Department.Create.Command
+﻿@model ContosoUniversity.Features.Department.Create.QueryResponse
 
 @{
-    ViewData["Title"] = "Create";
+    ViewBag.Title = "Create";
 }
 
 <h2>Create</h2>
@@ -37,14 +37,13 @@
             </div>
         </div>
 
-        @*todo: show dropdown list for instructor
-            <div class="form-group">
-            <label asp-for="Administrator" class="col-md-2 control-label"></label>
+        <div class="form-group">
+            <label asp-for="InstructorId" class="col-md-2 control-label"></label>
             <div class="col-md-10">
-                <input asp-for="Instructor" class="form-control"/>
-                <span asp-validation-for="Instructor" class="text-danger"></span>
+                <select asp-for="InstructorId" asp-items="Model.Instructors" class="form-control"></select>
+                <span asp-validation-for="InstructorId" class="text-danger"></span>
             </div>
-        </div>*@
+        </div>
 
     </div>
     <div class="form-group">
