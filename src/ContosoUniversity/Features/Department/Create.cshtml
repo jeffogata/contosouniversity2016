@@ -1,0 +1,60 @@
+﻿@model ContosoUniversity.Features.Department.Create.Command
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h2>Create</h2>
+
+<form asp-controller="Department" asp-action="Create" method="post" role="form">
+    
+    <div class="form-horizontal">
+        <h4>Department</h4>
+        <hr/>
+        @*todo: add validation summary*@
+
+        <div class="form-group">
+            <label asp-for="Name" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="Name" class="form-control"/>
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Budget" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="Budget" class="form-control" />
+                <span asp-validation-for="Budget" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="StartDate" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="StartDate" class="form-control" />
+                <span asp-validation-for="StartDate" class="text-danger"></span>
+            </div>
+        </div>
+
+        @*todo: show dropdown list for instructor
+            <div class="form-group">
+            <label asp-for="Administrator" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="Instructor" class="form-control"/>
+                <span asp-validation-for="Instructor" class="text-danger"></span>
+            </div>
+        </div>*@
+
+    </div>
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="submit" value="Create" class="btn btn-default"/>
+        </div>
+    </div>
+</form>
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+

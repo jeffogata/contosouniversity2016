@@ -21,5 +21,18 @@
 
             return View(model);
         }
+        public ActionResult Create()
+        {
+            return View(new Create.Command());
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(Create.Command model)
+        {
+            await _mediator.SendAsync(model);
+
+            return RedirectToAction("Index");
+        }
     }
 }

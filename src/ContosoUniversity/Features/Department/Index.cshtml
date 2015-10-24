@@ -5,7 +5,7 @@
 }
 <h2>Departments</h2>
 <p>
-    <a href="">Create New</a>
+    <a asp-action="Create">Create New</a>
 </p>
 <table class="table">
     <tr>
@@ -30,18 +30,18 @@
                 @item.Name
             </td>
             <td>
-                @item.Budget
+                @item.Budget.ToString("C")
             </td>
             <td>
-                @item.StartDate
+                @item.StartDate.ToString("d")
             </td>
             <td>
                 @item.AdministratorFullName
             </td>
             <td>
-                <a href="">Edit</a>
-                <a href="">Details</a>
-                <a href="">Delete</a>
+                <a asp-action="Edit">Edit</a> |
+                <a asp-action="Details">Details</a> |
+                <a asp-action="Delete">Delete</a>
             </td>
         </tr>
     }
