@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace ContosoUniversity.Features.Department
+﻿namespace ContosoUniversity.Features.Department
 {
+    using System;
+    using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
-    using System.ComponentModel.DataAnnotations.Schema;
+    using System.Linq;
+    using System.Threading.Tasks;
     using AutoMapper;
-    using AutoMapper.QueryableExtensions;
     using DataAccess;
+    using Infrastructure;
     using MediatR;
     using Microsoft.AspNet.Mvc.Rendering;
     using Microsoft.Data.Entity;
@@ -17,40 +15,40 @@ namespace ContosoUniversity.Features.Department
 
     public class Create
     {
-        public class Query : IAsyncRequest<QueryResponse>
+        public class Query : IAsyncRequest<Query.Response>
         {
-        }
-
-        public class QueryResponse
-        {
-            [StringLength(50, MinimumLength = 3)]
-            public string Name { get; set; }
-
-            [DataType(DataType.Currency)]
-            [Column(TypeName = "money")]
-            public decimal? Budget { get; set; }
-
-            [DataType(DataType.Date)]
-            [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
-            public DateTime? StartDate { get; set; }
-
-            [Display(Name = "Administrator")]
-            public int? InstructorId { get; set; }
-
-            //public List<Instructor> Instructors { get; set; }
-            public List<SelectListItem> Instructors { get; set; }
-        }
-
-        public class QueryHandler : IAsyncRequestHandler<Query, QueryResponse>
-        {
-            private readonly ContosoUniversityContext _dbContext;
-
-            public QueryHandler(ContosoUniversityContext dbContext)
+            public class Response
             {
-                _dbContext = dbContext;
+                public string Name { get; set; }
+                public decimal? Budget { get; set; }
+                // need the DataType attribute to have the datepicker rendered
+                [DataType(DataType.Date)]
+                public DateTime? StartDate { get; set; }
+
+                public int? InstructorId { get; set; }
+                public List<SelectListItem> Instructors { get; set; }
             }
 
-            public async Task<QueryResponse> Handle(Query message)
+            public class Instructor
+            {
+                public int Id { get; set; }
+                public string FirstName { get; set; }
+                public string LastName { get; set; }
+
+                public string FullName
+                {
+                    get { return $"{LastName}, {FirstName}"; }
+                }
+            }
+        }
+
+        public class QueryHandler : MediatorHandler<Query, Query.Response>
+        {
+            public QueryHandler(ContosoUniversityContext dbContext) : base(dbContext)
+            {
+            }
+
+            public override async Task<Query.Response> Handle(Query message)
             {
                 /*
                     wanted to do:
@@ -64,69 +62,48 @@ namespace ContosoUniversity.Features.Department
                     works fine in the HS Contoso example against EF 6.
                 */
 
-                var instructors = await _dbContext
+                var instructors = await DbContext
                     .Instructors
                     .OrderBy(i => i.LastName)
                     .ToListAsync();
 
-                var result = Mapper.Map<List<Instructor>>(instructors);
+                var result = Mapper.Map<List<Query.Instructor>>(instructors);
 
-                List<SelectListItem> items = result.Select(x =>
+                var items = result.Select(x =>
                     new SelectListItem
                     {
                         Value = x.Id.ToString(),
                         Text = x.FullName
                     }).ToList();
-                return new QueryResponse
+
+                return new Query.Response
                 {
                     Instructors = items
                 };
             }
         }
 
-        public class Command : IAsyncRequest
+        public class Command : IAsyncRequest<int>
         {
-            [StringLength(50, MinimumLength = 3)]
             public string Name { get; set; }
-
-            [DataType(DataType.Currency)]
-            [Column(TypeName = "money")]
             public decimal? Budget { get; set; }
-
-            [DataType(DataType.Date)]
-            [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
             public DateTime? StartDate { get; set; }
-
             public int? InstructorId { get; set; }
         }
 
-        public class Instructor
+        public class CommandHandler : MediatorHandler<Command, int>
         {
-            public int Id { get; set; }
-            public string FirstName { get; set; }
-            public string LastName { get; set; }
-            public string FullName
+            public CommandHandler(ContosoUniversityContext dbContext) : base(dbContext)
             {
-                get { return $"{LastName}, {FirstName}"; }
-            }
-        }
-
-        public class CommandHandler : AsyncRequestHandler<Command>
-        {
-            private readonly ContosoUniversityContext _context;
-
-            public CommandHandler(ContosoUniversityContext context)
-            {
-                _context = context;
             }
 
-            protected async override Task HandleCore(Command message)
+            public override async Task<int> Handle(Command message)
             {
                 var department = Mapper.Map<Command, Department>(message);
 
-                _context.Departments.Add(department);
+                DbContext.Departments.Add(department);
 
-                await _context.SaveChangesAsync();
+                return await DbContext.SaveChangesAsync();
             }
         }
     }
