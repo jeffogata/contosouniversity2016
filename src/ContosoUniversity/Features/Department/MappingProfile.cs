@@ -11,6 +11,7 @@
             CreateMap<Instructor, Create.Instructor>();
             CreateMap<Department, Index.Model>();
             CreateMap<Create.Command, Department>();
+            CreateMap<Department, Delete.QueryResponse>();
         }
     }
 }

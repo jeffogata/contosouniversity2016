@@ -17,7 +17,7 @@
 
         public int? InstructorId { get; set; }
         
-        [Timestamp]
+        //[Timestamp]  uncomment to use optimistic concurrency
         public byte[] RowVersion { get; set; }
 
         public virtual Instructor Administrator { get; set; }

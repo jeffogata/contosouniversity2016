@@ -23,7 +23,7 @@
 
             var asyncHandlerTypes = assemblies
                 .SelectMany(a => a.DefinedTypes)
-                .Where(typeInfo => typeInfo.GetInterfaces().Any(x =>
+                .Where(typeInfo => !typeInfo.IsAbstract && typeInfo.GetInterfaces().Any(x =>
                     x.IsGenericType && x.GetGenericTypeDefinition() == typeof (IAsyncRequestHandler<,>)));
 
             foreach (var type in asyncHandlerTypes)
@@ -35,7 +35,7 @@
 
             var handlerTypes = assemblies
                 .SelectMany(a => a.DefinedTypes)
-                .Where(typeInfo => typeInfo.GetInterfaces().Any(x =>
+                .Where(typeInfo => !typeInfo.IsAbstract && typeInfo.GetInterfaces().Any(x =>
                     x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IRequestHandler<,>)));
 
             foreach (var type in handlerTypes)

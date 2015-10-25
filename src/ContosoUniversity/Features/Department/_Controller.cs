@@ -36,5 +36,21 @@
 
             return RedirectToAction("Index");
         }
+
+        public async Task<IActionResult> Delete(int id)
+        {
+            var model = await _mediator.SendAsync(new Delete.Query(id));
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(Delete.Command model)
+        {
+            await _mediator.SendAsync(model);
+
+            return RedirectToAction("Index");
+        }
     }
 }
