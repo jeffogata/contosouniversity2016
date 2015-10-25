@@ -5,51 +5,49 @@
     using System.Threading.Tasks;
     using AutoMapper.QueryableExtensions;
     using DataAccess;
+    using Infrastructure;
     using MediatR;
     using Microsoft.Data.Entity;
     using Models;
 
     public class Index
     {
-        public class Query : IAsyncRequest<Result>
+        public class Query : IAsyncRequest<Query.Result>
         {
             public Department SelectedDepartment { get; set; }
-        }
 
-        public class Result
-        {
-            public Department SelectedDepartment { get; set; }
-            public List<Course> Courses { get; set; }
-
-            public class Course
+            public class Result
             {
-                public int Id { get; set; }
-                public string Number { get; set; }
-                public string Title { get; set; }
-                public int Credits { get; set; }
-                public string DepartmentName { get; set; }
+                public Department SelectedDepartment { get; set; }
+                public List<Course> Courses { get; set; }
+
+                public class Course
+                {
+                    public int Id { get; set; }
+                    public string Number { get; set; }
+                    public string Title { get; set; }
+                    public int Credits { get; set; }
+                    public string DepartmentName { get; set; }
+                }
             }
         }
 
-        public class Handler : IAsyncRequestHandler<Query, Result>
+        public class Handler : MediatorHandler<Query, Query.Result>
         {
-            private readonly ContosoUniversityContext _db;
-
-            public Handler(ContosoUniversityContext db)
+            public Handler(ContosoUniversityContext dbContext) : base(dbContext)
             {
-                _db = db;
             }
 
-            public async Task<Result> Handle(Query message)
+            public override async Task<Query.Result> Handle(Query message)
             {
                 var departmentId = message.SelectedDepartment?.Id;
 
-                var courses = await _db.Courses
+                var courses = await DbContext.Courses
                     .Where(c => !departmentId.HasValue || c.DepartmentId == departmentId)
                     .OrderBy(d => d.Id)
-                    .ProjectTo<Result.Course>().ToListAsync();
+                    .ProjectTo<Query.Result.Course>().ToListAsync();
 
-                return new Result
+                return new Query.Result
                 {
                     Courses = courses,
                     SelectedDepartment = message.SelectedDepartment

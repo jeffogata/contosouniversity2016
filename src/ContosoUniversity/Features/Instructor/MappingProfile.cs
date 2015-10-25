@@ -7,10 +7,10 @@
     {
         protected override void Configure()
         {
-            CreateMap<Instructor, Index.Model.Instructor>();
-            CreateMap<CourseInstructor, Index.Model.CourseInstructor>();
-            CreateMap<Course, Index.Model.Course>();
-            CreateMap<Enrollment, Index.Model.Enrollment>();
+            CreateMap<Instructor, Index.Query.Response.Instructor>();
+            CreateMap<CourseInstructor, Index.Query.Response.CourseInstructor>();
+            CreateMap<Course, Index.Query.Response.Course>();
+            CreateMap<Enrollment, Index.Query.Response.Enrollment>();
         }
     }
 }

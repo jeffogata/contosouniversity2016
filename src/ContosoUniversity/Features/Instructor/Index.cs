@@ -8,109 +8,103 @@
     using AutoMapper;
     using AutoMapper.QueryableExtensions;
     using DataAccess;
-    using Mapping;
+    using Infrastructure;
     using MediatR;
     using Microsoft.Data.Entity;
     using Models;
 
     public class Index
     {
-        public class Query : IAsyncRequest<Model>
+        public class Query : IAsyncRequest<Query.Response>
         {
             public int? Id { get; set; }
-            public int? CourseID { get; set; }
-        }
-
-        public class Model
-        {
-            public int? InstructorId { get; set; }
             public int? CourseId { get; set; }
-            public List<Instructor> Instructors { get; set; }
-            public List<Course> Courses { get; set; }
-            public List<Enrollment> Enrollments { get; set; }
 
-            public class Instructor
+            public class Response
             {
-                public int Id { get; set; }
+                public int? InstructorId { get; set; }
+                public int? CourseId { get; set; }
+                public List<Instructor> Instructors { get; set; }
+                public List<Course> Courses { get; set; }
+                public List<Enrollment> Enrollments { get; set; }
 
-                [Display(Name = "Last Name")]
-                public string LastName { get; set; }
+                public class Instructor
+                {
+                    public int Id { get; set; }
 
-                [Display(Name = "First Name")]
-                public string FirstName { get; set; }
+                    [Display(Name = "Last Name")]
+                    public string LastName { get; set; }
 
-                [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
-                [Display(Name = "Hire Date")]
-                public DateTime? HireDate { get; set; }
+                    [Display(Name = "First Name")]
+                    public string FirstName { get; set; }
 
-                //public string OfficeAssignmentLocation { get; set; }
-                //public IEnumerable<CourseInstructor> CourseInstructors { get; set; }
-            }
+                    [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
+                    [Display(Name = "Hire Date")]
+                    public DateTime? HireDate { get; set; }
+                }
 
-            public class CourseInstructor
-            {
-                public int CourseId { get; set; }
-                public string CourseTitle { get; set; }
-            }
+                public class CourseInstructor
+                {
+                    public int CourseId { get; set; }
+                    public string CourseTitle { get; set; }
+                }
 
-            public class Course
-            {
-                public int CourseId { get; set; }
-                public string Title { get; set; }
-                public string DepartmentName { get; set; }
-            }
+                public class Course
+                {
+                    public int CourseId { get; set; }
+                    public string Title { get; set; }
+                    public string DepartmentName { get; set; }
+                }
 
-            public class Enrollment
-            {
-                [DisplayFormat(NullDisplayText = "No grade")]
-                public Grade? Grade { get; set; }
+                public class Enrollment
+                {
+                    [DisplayFormat(NullDisplayText = "No grade")]
+                    public Grade? Grade { get; set; }
 
-                public string StudentFullName { get; set; }
+                    public string StudentFullName { get; set; }
+                }
             }
         }
 
-        public class Handler : IAsyncRequestHandler<Query, Model>
+        public class Handler : MediatorHandler<Query, Query.Response>
         {
-            private readonly ContosoUniversityContext _db;
-
-            public Handler(ContosoUniversityContext db)
+            public Handler(ContosoUniversityContext dbContext) : base(dbContext)
             {
-                _db = db;
             }
 
-            public async Task<Model> Handle(Query message)
+            public override async Task<Query.Response> Handle(Query message)
             {
-                var instructors = 
-                    Mapper.Map<List<Model.Instructor>>(await _db.Instructors
-                    .OrderBy(i => i.LastName)
-                    .ToListAsync());
+                var instructors =
+                    Mapper.Map<List<Query.Response.Instructor>>(await DbContext.Instructors
+                        .OrderBy(i => i.LastName)
+                        .ToListAsync());
 
-                var courses = new List<Model.Course>();
-                var enrollments = new List<Model.Enrollment>();
+                var courses = new List<Query.Response.Course>();
+                var enrollments = new List<Query.Response.Enrollment>();
 
                 if (message.Id != null)
                 {
-                    courses = await _db.Courses
+                    courses = await DbContext.Courses
                         .Where(c => c.CourseInstructors.Any(ci => ci.InstructorId == message.Id))
-                        .ProjectTo<Model.Course>()
+                        .ProjectTo<Query.Response.Course>()
                         .ToListAsync();
                 }
 
-                if (message.CourseID != null)
+                if (message.CourseId != null)
                 {
-                    enrollments = await _db.Enrollments
-                        .Where(x => x.CourseId == message.CourseID)
-                        .ProjectTo<Model.Enrollment>()
+                    enrollments = await DbContext.Enrollments
+                        .Where(x => x.CourseId == message.CourseId)
+                        .ProjectTo<Query.Response.Enrollment>()
                         .ToListAsync();
                 }
 
-                var viewModel = new Model
+                var viewModel = new Query.Response
                 {
                     Instructors = instructors,
                     Courses = courses,
                     Enrollments = enrollments,
                     InstructorId = message.Id,
-                    CourseId = message.CourseID
+                    CourseId = message.CourseId
                 };
 
                 return viewModel;

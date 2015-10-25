@@ -1,20 +1,14 @@
 ﻿namespace ContosoUniversity.Features.Student
 {
-    using MediatR;
+    using System.Threading.Tasks;
+    using Infrastructure;
     using Microsoft.AspNet.Mvc;
 
-    public class _Controller : Controller
+    public class _Controller : MediatorController
     {
-        private readonly IMediator _mediator;
-
-        public _Controller(IMediator mediator)
+        public async Task<IActionResult> Index(Index.Query query)
         {
-            _mediator = mediator;
-        }
-
-        public ViewResult Index(Index.Query query)
-        {
-            var model = _mediator.Send(query);
+            var model = await Mediator.SendAsync(query);
 
             return View(model);
         }

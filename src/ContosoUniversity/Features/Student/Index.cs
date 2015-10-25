@@ -1,63 +1,61 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace ContosoUniversity.Features.Student
+﻿namespace ContosoUniversity.Features.Student
 {
-    using AutoMapper;
-    using AutoMapper.QueryableExtensions;
+    using System;
+    using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using AutoMapper;
     using DataAccess;
+    using Infrastructure;
     using MediatR;
+    using Microsoft.Data.Entity;
     using PagedList;
 
     public class Index
     {
-        public class Query : IRequest<Result>
+        public class Query : IAsyncRequest<Query.Result>
         {
             public string SortOrder { get; set; }
             public string CurrentFilter { get; set; }
             public string SearchString { get; set; }
             public int? Page { get; set; }
-        }
 
-        public class Result
-        {
-            public string CurrentSort { get; set; }
-            public string NameSortParm { get; set; }
-            public string DateSortParm { get; set; }
-            public string CurrentFilter { get; set; }
-            public string SearchString { get; set; }
-
-            public IPagedList<Model> Results { get; set; }
-        }
-
-        public class Model
-        {
-            public int ID { get; set; }
-            [Display(Name = "First Name")]
-            public string FirstName { get; set; }
-            public string LastName { get; set; }
-            public DateTime? EnrollmentDate { get; set; }
-        }
-
-        public class QueryHandler : IRequestHandler<Query, Result>
-        {
-            private readonly ContosoUniversityContext _db;
-
-            public QueryHandler(ContosoUniversityContext db)
+            public class Result
             {
-                _db = db;
+                public string CurrentSort { get; set; }
+                public string NameSortParm { get; set; }
+                public string DateSortParm { get; set; }
+                public string CurrentFilter { get; set; }
+                public string SearchString { get; set; }
+                public IPagedList<Student> Results { get; set; }
             }
 
-            public Result Handle(Query message)
+            public class Student
             {
-                var model = new Result
+                public int ID { get; set; }
+
+                [Display(Name = "First Name")]
+                public string FirstName { get; set; }
+
+                public string LastName { get; set; }
+                public DateTime? EnrollmentDate { get; set; }
+            }
+        }
+
+        public class QueryHandler : MediatorHandler<Query, Query.Result>
+        {
+            public QueryHandler(ContosoUniversityContext dbContext) : base(dbContext)
+            {
+            }
+
+            public override async Task<Query.Result> Handle(Query message)
+            {
+                var model = new Query.Result
                 {
                     CurrentSort = message.SortOrder,
                     NameSortParm = string.IsNullOrEmpty(message.SortOrder) ? "name_desc" : "",
-                    DateSortParm = message.SortOrder == "Date" ? "date_desc" : "Date",
+                    DateSortParm = message.SortOrder == "Date" ? "date_desc" : "Date"
                 };
 
                 if (message.SearchString != null)
@@ -72,8 +70,9 @@ namespace ContosoUniversity.Features.Student
                 model.CurrentFilter = message.SearchString;
                 model.SearchString = message.SearchString;
 
-                var students = from s in _db.Students
-                               select s;
+                var students = from s in DbContext.Students
+                    select s;
+
                 if (!string.IsNullOrEmpty(message.SearchString))
                 {
                     students = students.Where(s => s.LastName.Contains(message.SearchString)
@@ -95,12 +94,14 @@ namespace ContosoUniversity.Features.Student
                         break;
                 }
 
-                int pageSize = 3;
-                int pageNumber = (message.Page ?? 1);
+                var pageSize = 3;
+                var pageNumber = (message.Page ?? 1);
 
+                var source = await students.ToListAsync();
 
                 // problems using ProjectTo on Person/Student hierarchy
-                var mapped = Mapper.Map<List<Model>>(students.ToList());
+                var mapped = Mapper.Map<List<Query.Student>>(source);
+
                 model.Results = mapped.AsQueryable().ToPagedList(pageNumber, pageSize);
 
                 return model;
