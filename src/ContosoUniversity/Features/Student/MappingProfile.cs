@@ -7,7 +7,7 @@
     {
         protected override void Configure()
         {
-            CreateMap<Student, Index.Query.Student>();
+            CreateMap<Student, Index.QueryResponse.Student>();
         }
     }
 }

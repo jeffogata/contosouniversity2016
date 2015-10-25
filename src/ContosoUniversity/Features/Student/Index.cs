@@ -14,22 +14,22 @@
 
     public class Index
     {
-        public class Query : IAsyncRequest<Query.Result>
+        public class Query : IAsyncRequest<QueryResponse>
         {
             public string SortOrder { get; set; }
             public string CurrentFilter { get; set; }
             public string SearchString { get; set; }
             public int? Page { get; set; }
+        }
 
-            public class Result
-            {
-                public string CurrentSort { get; set; }
-                public string NameSortParm { get; set; }
-                public string DateSortParm { get; set; }
-                public string CurrentFilter { get; set; }
-                public string SearchString { get; set; }
-                public IPagedList<Student> Results { get; set; }
-            }
+        public class QueryResponse
+        {
+            public string CurrentSort { get; set; }
+            public string NameSortParm { get; set; }
+            public string DateSortParm { get; set; }
+            public string CurrentFilter { get; set; }
+            public string SearchString { get; set; }
+            public IPagedList<Student> Results { get; set; }
 
             public class Student
             {
@@ -43,15 +43,15 @@
             }
         }
 
-        public class QueryHandler : MediatorHandler<Query, Query.Result>
+        public class QueryHandler : MediatorHandler<Query, QueryResponse>
         {
             public QueryHandler(ContosoUniversityContext dbContext) : base(dbContext)
             {
             }
 
-            public override async Task<Query.Result> Handle(Query message)
+            public override async Task<QueryResponse> Handle(Query message)
             {
-                var model = new Query.Result
+                var model = new QueryResponse
                 {
                     CurrentSort = message.SortOrder,
                     NameSortParm = string.IsNullOrEmpty(message.SortOrder) ? "name_desc" : "",
@@ -100,7 +100,7 @@
                 var source = await students.ToListAsync();
 
                 // problems using ProjectTo on Person/Student hierarchy
-                var mapped = Mapper.Map<List<Query.Student>>(source);
+                var mapped = Mapper.Map<List<QueryResponse.Student>>(source);
 
                 model.Results = mapped.AsQueryable().ToPagedList(pageNumber, pageSize);
 

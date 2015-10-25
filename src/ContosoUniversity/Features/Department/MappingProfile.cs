@@ -7,11 +7,11 @@
     {
         protected override void Configure()
         {
-            CreateMap<Instructor, Index.Query.Administrator>();
-            CreateMap<Instructor, Create.Query.Instructor>();
-            CreateMap<Department, Index.Query.Department>();
+            CreateMap<Instructor, Index.QueryResponse.Administrator>();
+            CreateMap<Instructor, Create.QueryResponse.Instructor>();
+            CreateMap<Department, Index.QueryResponse.Department>();
             CreateMap<Create.Command, Department>();
-            CreateMap<Department, Delete.Query.Response>();
+            CreateMap<Department, Delete.QueryResponse>();
         }
     }
 }

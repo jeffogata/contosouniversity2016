@@ -12,42 +12,42 @@
 
     public class Index
     {
-        public class Query : IAsyncRequest<Query.Result>
+        public class Query : IAsyncRequest<QueryResponse>
         {
             public Department SelectedDepartment { get; set; }
+        }
 
-            public class Result
+        public class QueryResponse
+        {
+            public Department SelectedDepartment { get; set; }
+            public List<Course> Courses { get; set; }
+
+            public class Course
             {
-                public Department SelectedDepartment { get; set; }
-                public List<Course> Courses { get; set; }
-
-                public class Course
-                {
-                    public int Id { get; set; }
-                    public string Number { get; set; }
-                    public string Title { get; set; }
-                    public int Credits { get; set; }
-                    public string DepartmentName { get; set; }
-                }
+                public int Id { get; set; }
+                public string Number { get; set; }
+                public string Title { get; set; }
+                public int Credits { get; set; }
+                public string DepartmentName { get; set; }
             }
         }
 
-        public class Handler : MediatorHandler<Query, Query.Result>
+        public class Handler : MediatorHandler<Query, QueryResponse>
         {
             public Handler(ContosoUniversityContext dbContext) : base(dbContext)
             {
             }
 
-            public override async Task<Query.Result> Handle(Query message)
+            public override async Task<QueryResponse> Handle(Query message)
             {
                 var departmentId = message.SelectedDepartment?.Id;
 
                 var courses = await DbContext.Courses
                     .Where(c => !departmentId.HasValue || c.DepartmentId == departmentId)
                     .OrderBy(d => d.Id)
-                    .ProjectTo<Query.Result.Course>().ToListAsync();
+                    .ProjectTo<QueryResponse.Course>().ToListAsync();
 
-                return new Query.Result
+                return new QueryResponse
                 {
                     Courses = courses,
                     SelectedDepartment = message.SelectedDepartment

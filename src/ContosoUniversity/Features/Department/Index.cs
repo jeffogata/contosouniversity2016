@@ -12,7 +12,11 @@
 
     public class Index
     {
-        public class Query : IAsyncRequest<Query.Response>
+        public class Query : IAsyncRequest<QueryResponse>
+        {
+        }
+
+        public class QueryResponse : List<QueryResponse.Department>
         {
             public class Administrator
             {
@@ -28,19 +32,15 @@
                 public DateTime StartDate { get; set; }
                 public string AdministratorFullName { get; set; }
             }
-
-            public class Response : List<Department>
-            {
-            }
         }
 
-        public class QueryHandler : MediatorHandler<Query, Query.Response>
+        public class QueryHandler : MediatorHandler<Query, QueryResponse>
         {
             public QueryHandler(ContosoUniversityContext dbContext) : base(dbContext)
             {
             }
 
-            public override async Task<Query.Response> Handle(Query message)
+            public override async Task<QueryResponse> Handle(Query message)
             {
                 /* 
                     wanted to use ProjectTo, but that generates an inner join, returning only the 
@@ -61,7 +61,7 @@
                     .Include(x => x.Administrator)
                     .ToListAsync();
 
-                return Mapper.Map<Query.Response>(departments);
+                return Mapper.Map<QueryResponse>(departments);
             }
         }
     }

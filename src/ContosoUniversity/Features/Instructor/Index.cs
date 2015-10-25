@@ -15,78 +15,78 @@
 
     public class Index
     {
-        public class Query : IAsyncRequest<Query.Response>
+        public class Query : IAsyncRequest<QueryResponse>
         {
             public int? Id { get; set; }
             public int? CourseId { get; set; }
+        }
 
-            public class Response
+        public class QueryResponse
+        {
+            public int? InstructorId { get; set; }
+            public int? CourseId { get; set; }
+            public List<Instructor> Instructors { get; set; }
+            public List<Course> Courses { get; set; }
+            public List<Enrollment> Enrollments { get; set; }
+
+            public class Instructor
             {
-                public int? InstructorId { get; set; }
-                public int? CourseId { get; set; }
-                public List<Instructor> Instructors { get; set; }
-                public List<Course> Courses { get; set; }
-                public List<Enrollment> Enrollments { get; set; }
+                public int Id { get; set; }
 
-                public class Instructor
-                {
-                    public int Id { get; set; }
+                [Display(Name = "Last Name")]
+                public string LastName { get; set; }
 
-                    [Display(Name = "Last Name")]
-                    public string LastName { get; set; }
+                [Display(Name = "First Name")]
+                public string FirstName { get; set; }
 
-                    [Display(Name = "First Name")]
-                    public string FirstName { get; set; }
+                [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
+                [Display(Name = "Hire Date")]
+                public DateTime? HireDate { get; set; }
+            }
 
-                    [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
-                    [Display(Name = "Hire Date")]
-                    public DateTime? HireDate { get; set; }
-                }
+            public class CourseInstructor
+            {
+                public int CourseId { get; set; }
+                public string CourseTitle { get; set; }
+            }
 
-                public class CourseInstructor
-                {
-                    public int CourseId { get; set; }
-                    public string CourseTitle { get; set; }
-                }
+            public class Course
+            {
+                public int CourseId { get; set; }
+                public string Title { get; set; }
+                public string DepartmentName { get; set; }
+            }
 
-                public class Course
-                {
-                    public int CourseId { get; set; }
-                    public string Title { get; set; }
-                    public string DepartmentName { get; set; }
-                }
+            public class Enrollment
+            {
+                [DisplayFormat(NullDisplayText = "No grade")]
+                public Grade? Grade { get; set; }
 
-                public class Enrollment
-                {
-                    [DisplayFormat(NullDisplayText = "No grade")]
-                    public Grade? Grade { get; set; }
-
-                    public string StudentFullName { get; set; }
-                }
+                public string StudentFullName { get; set; }
             }
         }
 
-        public class Handler : MediatorHandler<Query, Query.Response>
+        public class Handler : MediatorHandler<Query, QueryResponse>
         {
             public Handler(ContosoUniversityContext dbContext) : base(dbContext)
             {
             }
 
-            public override async Task<Query.Response> Handle(Query message)
+            public override async Task<QueryResponse> Handle(Query message)
             {
                 var instructors =
-                    Mapper.Map<List<Query.Response.Instructor>>(await DbContext.Instructors
+                    Mapper.Map<List<QueryResponse.Instructor>>(await DbContext.Instructors
                         .OrderBy(i => i.LastName)
                         .ToListAsync());
 
-                var courses = new List<Query.Response.Course>();
-                var enrollments = new List<Query.Response.Enrollment>();
+                var courses = new List<QueryResponse.Course>();
+                var enrollments = new List<QueryResponse.Enrollment>();
 
                 if (message.Id != null)
                 {
                     courses = await DbContext.Courses
                         .Where(c => c.CourseInstructors.Any(ci => ci.InstructorId == message.Id))
-                        .ProjectTo<Query.Response.Course>()
+                        .ProjectTo<QueryResponse.Course>()
                         .ToListAsync();
                 }
 
@@ -94,11 +94,11 @@
                 {
                     enrollments = await DbContext.Enrollments
                         .Where(x => x.CourseId == message.CourseId)
-                        .ProjectTo<Query.Response.Enrollment>()
+                        .ProjectTo<QueryResponse.Enrollment>()
                         .ToListAsync();
                 }
 
-                var viewModel = new Query.Response
+                var viewModel = new QueryResponse
                 {
                     Instructors = instructors,
                     Courses = courses,

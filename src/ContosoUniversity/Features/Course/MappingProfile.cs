@@ -7,7 +7,7 @@
     {
         protected override void Configure()
         {
-            CreateMap<Course, Index.Query.Result.Course>();
+            CreateMap<Course, Index.QueryResponse.Course>();
         }
     }
 }

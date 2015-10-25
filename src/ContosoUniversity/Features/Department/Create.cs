@@ -15,19 +15,20 @@
 
     public class Create
     {
-        public class Query : IAsyncRequest<Query.Response>
+        public class Query : IAsyncRequest<QueryResponse>
         {
-            public class Response
-            {
-                public string Name { get; set; }
-                public decimal? Budget { get; set; }
-                // need the DataType attribute to have the datepicker rendered
-                [DataType(DataType.Date)]
-                public DateTime? StartDate { get; set; }
+        }
 
-                public int? InstructorId { get; set; }
-                public List<SelectListItem> Instructors { get; set; }
-            }
+        public class QueryResponse
+        {
+            public string Name { get; set; }
+            public decimal? Budget { get; set; }
+            // need the DataType attribute to have the datepicker rendered
+            [DataType(DataType.Date)]
+            public DateTime? StartDate { get; set; }
+
+            public int? InstructorId { get; set; }
+            public List<SelectListItem> Instructors { get; set; }
 
             public class Instructor
             {
@@ -42,13 +43,13 @@
             }
         }
 
-        public class QueryHandler : MediatorHandler<Query, Query.Response>
+        public class QueryHandler : MediatorHandler<Query, QueryResponse>
         {
             public QueryHandler(ContosoUniversityContext dbContext) : base(dbContext)
             {
             }
 
-            public override async Task<Query.Response> Handle(Query message)
+            public override async Task<QueryResponse> Handle(Query message)
             {
                 /*
                     wanted to do:
@@ -67,7 +68,7 @@
                     .OrderBy(i => i.LastName)
                     .ToListAsync();
 
-                var result = Mapper.Map<List<Query.Instructor>>(instructors);
+                var result = Mapper.Map<List<QueryResponse.Instructor>>(instructors);
 
                 var items = result.Select(x =>
                     new SelectListItem
@@ -76,7 +77,7 @@
                         Text = x.FullName
                     }).ToList();
 
-                return new Query.Response
+                return new QueryResponse
                 {
                     Instructors = items
                 };
