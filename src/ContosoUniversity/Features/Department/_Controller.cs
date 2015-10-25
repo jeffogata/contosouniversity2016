@@ -13,6 +13,13 @@
             return View(model);
         }
 
+        public async Task<IActionResult> Details(int id)
+        {
+            var model = await Mediator.SendAsync(new Details.Query(id));
+
+            return View(model);
+        }
+
         public async Task<IActionResult> Create()
         {
             var model = await Mediator.SendAsync(new Create.Query());
