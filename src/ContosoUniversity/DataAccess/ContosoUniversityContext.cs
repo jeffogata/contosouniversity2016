@@ -14,6 +14,12 @@
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
+            // ignore RowVersion for now - we need to ignore or set to computed for insert/update to work
+            // use this later when we add optimistic concurrency
+            modelBuilder.Entity<Department>()
+                .Ignore(x => x.RowVersion);
+
             modelBuilder.Entity<Student>()
                 .BaseType<Person>();
 

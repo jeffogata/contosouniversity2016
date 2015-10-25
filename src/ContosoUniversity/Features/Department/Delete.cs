@@ -36,7 +36,7 @@
             public DateTime? StartDate { get; set; }
         }
 
-        public class QueryHandler : MediatorRequestHandler<Query, QueryResponse>
+        public class QueryHandler : MediatorHandler<Query, QueryResponse>
         {
             public QueryHandler(ContosoUniversityContext dbContext) : base(dbContext)
             {

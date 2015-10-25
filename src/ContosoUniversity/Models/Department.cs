@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
+    using AutoMapper;
 
     public class Department : Entity
     {
@@ -18,6 +19,7 @@
         public int? InstructorId { get; set; }
         
         //[Timestamp]  uncomment to use optimistic concurrency
+        // Set this to computed for now (see context configuration)
         public byte[] RowVersion { get; set; }
 
         public virtual Instructor Administrator { get; set; }

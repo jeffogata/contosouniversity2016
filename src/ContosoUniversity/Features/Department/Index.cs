@@ -6,41 +6,41 @@
     using System.Threading.Tasks;
     using AutoMapper;
     using DataAccess;
+    using Infrastructure;
     using MediatR;
     using Microsoft.Data.Entity;
 
     public class Index
     {
-        public class Query : IAsyncRequest<List<Model>>
+        public class Query : IAsyncRequest<Query.Response>
         {
-        }
-
-        public class Model
-        {
-            public int Id { get; set; }
-            public string Name { get; set; }
-            public decimal Budget { get; set; }
-            public DateTime StartDate { get; set; }
-            //public Administrator Administrator { get; set; }
-            public string AdministratorFullName { get; set; }
-        }
-
-        public class Administrator
-        {
-            [Display(Name = "Administrator")]
-            public string FullName { get; set; }
-        }
-
-        public class QueryHandler : IAsyncRequestHandler<Query, List<Model>>
-        {
-            private readonly ContosoUniversityContext _context;
-
-            public QueryHandler(ContosoUniversityContext context)
+            public class Administrator
             {
-                _context = context;
+                [Display(Name = "Administrator")]
+                public string FullName { get; set; }
             }
 
-            public async Task<List<Model>> Handle(Query message)
+            public class Department
+            {
+                public int Id { get; set; }
+                public string Name { get; set; }
+                public decimal Budget { get; set; }
+                public DateTime StartDate { get; set; }
+                public string AdministratorFullName { get; set; }
+            }
+
+            public class Response : List<Department>
+            {
+            }
+        }
+
+        public class QueryHandler : MediatorHandler<Query, Query.Response>
+        {
+            public QueryHandler(ContosoUniversityContext dbContext) : base(dbContext)
+            {
+            }
+
+            public override async Task<Query.Response> Handle(Query message)
             {
                 /* 
                     wanted to use ProjectTo, but that generates an inner join, returning only the 
@@ -48,7 +48,7 @@
               
                         return await _context
                             .Departments
-                            .ProjectTo<Model>()
+                            .ProjectTo<Department>()
                             .ToListAsync();
                     
                     tried doing .Departments.Include(x => x.Administrator), but that didn't matter.
@@ -56,12 +56,12 @@
                     want to spend the time on that now
                 */
 
-                var departments = await _context
+                var departments = await DbContext
                     .Departments
                     .Include(x => x.Administrator)
                     .ToListAsync();
 
-                return Mapper.Map<List<Model>>(departments);
+                return Mapper.Map<Query.Response>(departments);
             }
         }
     }
