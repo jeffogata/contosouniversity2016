@@ -12,7 +12,7 @@
 
     public class Delete
     {
-        public class Query : IAsyncRequest<QueryResponse>
+        public class Query : IAsyncRequest<Query.Response>
         {
             public Query(int id)
             {
@@ -20,61 +20,58 @@
             }
 
             public int Id { get; set; }
+
+            public class Response
+            {
+                public int Id { get; set; }
+
+                [Display(Name = "Administrator")]
+                public string AdministratorFullName { get; set; }
+
+                public string Name { get; set; }
+                public decimal Budget { get; set; }
+
+                [Display(Name = "Start Date")]
+                public DateTime? StartDate { get; set; }
+            }
         }
 
-        public class QueryResponse
-        {
-            public int Id { get; set; }
-
-            [Display(Name = "Administrator")]
-            public string AdministratorFullName { get; set; }
-
-            public string Name { get; set; }
-            public decimal Budget { get; set; }
-
-            [Display(Name = "Start Date")]
-            public DateTime? StartDate { get; set; }
-        }
-
-        public class QueryHandler : MediatorHandler<Query, QueryResponse>
+        public class QueryHandler : MediatorHandler<Query, Query.Response>
         {
             public QueryHandler(ContosoUniversityContext dbContext) : base(dbContext)
             {
             }
 
-            public override async Task<QueryResponse> Handle(Query message)
+            public override async Task<Query.Response> Handle(Query message)
             {
                 var department = await DbContext.Departments
                     .Include(x => x.Administrator)
                     .FirstOrDefaultAsync(x => x.Id == message.Id);
 
-                var result = Mapper.Map<QueryResponse>(department);
+                var result = Mapper.Map<Query.Response>(department);
 
                 return result;
             }
         }
 
-        public class Command : IAsyncRequest
+        public class Command : IAsyncRequest<int>
         {
             public int Id { get; set; }
         }
 
-        public class CommandHandler : AsyncRequestHandler<Command>
+        public class CommandHandler : MediatorHandler<Command, int>
         {
-            private readonly ContosoUniversityContext _dbContext;
-
-            public CommandHandler(ContosoUniversityContext dbContext)
+            public CommandHandler(ContosoUniversityContext dbContext) : base(dbContext)
             {
-                _dbContext = dbContext;
             }
 
-            protected override async Task HandleCore(Command message)
+            public override async Task<int> Handle(Command message)
             {
                 var department = new Department {Id = message.Id};
 
-                _dbContext.Departments.Remove(department);
+                DbContext.Departments.Remove(department);
 
-                await _dbContext.SaveChangesAsync();
+                return await DbContext.SaveChangesAsync();
             }
         }
     }
