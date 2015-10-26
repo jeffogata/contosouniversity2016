@@ -11,38 +11,22 @@
     using MediatR;
     using Microsoft.AspNet.Mvc.Rendering;
     using Microsoft.Data.Entity;
-    using Models;
 
-    public class Create
+    public class Edit
     {
         public class Query : IAsyncRequest<QueryResponse>
         {
+            public Query(int id)
+            {
+                Id = id;
+            }
+
+            public int Id { get; set; }
         }
 
-        public class QueryResponse
+        public class QueryResponse : Create.QueryResponse
         {
-            public string Name { get; set; }
-            public decimal? Budget { get; set; }
-            // need the DataType attribute to have the datepicker rendered
-            [DataType(DataType.Date)]
-            [Display(Name = "Start Date")]
-            public DateTime? StartDate { get; set; }
-
-            [Display(Name = "Administrator")]
-            public int? InstructorId { get; set; }
-            public List<SelectListItem> Instructors { get; set; }
-
-            public class Instructor
-            {
-                public int Id { get; set; }
-                public string FirstName { get; set; }
-                public string LastName { get; set; }
-
-                public string FullName
-                {
-                    get { return $"{LastName}, {FirstName}"; }
-                }
-            }
+            public int Id { get; set; }
         }
 
         public class QueryHandler : MediatorHandler<Query, QueryResponse>
@@ -53,6 +37,12 @@
 
             public override async Task<QueryResponse> Handle(Query message)
             {
+                var department = await DbContext.Departments
+                    .Include(x => x.Administrator)
+                    .FirstOrDefaultAsync(x => x.Id == message.Id);
+
+                var response = Mapper.Map<QueryResponse>(department);
+
                 /*
                     wanted to do:
 
@@ -70,38 +60,35 @@
                     .OrderBy(i => i.LastName)
                     .ToListAsync();
 
-                var result = Mapper.Map<List<QueryResponse.Instructor>>(instructors);
+                var mappedInstructors = Mapper.Map<List<Create.QueryResponse.Instructor>>(instructors);
 
-                var items = result.Select(x =>
+                var items = mappedInstructors.Select(x =>
                     new SelectListItem
                     {
                         Value = x.Id.ToString(),
                         Text = x.FullName
                     }).ToList();
 
-
                 var nullItem = new SelectListItem
                 {
                     Value = "",
                     Text = "",
-                    Selected = true
+                    Selected = response?.InstructorId.HasValue != true
                 };
 
                 items.Insert(0, nullItem);
+                response.Instructors = items;
 
-                return new QueryResponse
-                {
-                    StartDate = DateTime.Now.Date,
-                    Instructors = items
-                };
+                return response;
             }
         }
 
         public class Command : IAsyncRequest<int>
         {
+            public int Id { get; set; }
             public string Name { get; set; }
-            public decimal? Budget { get; set; }
-            public DateTime? StartDate { get; set; }
+            public decimal Budget { get; set; }
+            public DateTime StartDate { get; set; }
             public int? InstructorId { get; set; }
         }
 
@@ -113,11 +100,21 @@
 
             public override async Task<int> Handle(Command message)
             {
-                var department = Mapper.Map<Command, Department>(message);
+                var department = DbContext.Departments.FirstOrDefault(x => x.Id == message.Id);
 
-                DbContext.Departments.Add(department);
+                // todo: need to handle not found
 
-                return await DbContext.SaveChangesAsync();
+                if (department != null)
+                {
+                    department.Name = message.Name;
+                    department.Budget = message.Budget;
+                    department.StartDate = message.StartDate;
+                    department.InstructorId = message.InstructorId;
+
+                    return await DbContext.SaveChangesAsync();
+                }
+
+                return 0;
             }
         }
     }

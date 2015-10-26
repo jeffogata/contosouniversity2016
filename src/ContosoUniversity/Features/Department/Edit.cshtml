@@ -1,22 +1,26 @@
-﻿@model ContosoUniversity.Features.Department.Create.QueryResponse
+﻿@using Microsoft.Data.Entity.Metadata
+@model ContosoUniversity.Features.Department.Edit.QueryResponse
 
 @{
-    ViewBag.Title = "Create";
+    ViewBag.Title = "Edit";
 }
 
-<h2>Create</h2>
+<h2>Edit</h2>
 
-<form asp-controller="Department" asp-action="Create" method="post" role="form">
-    
+<form asp-controller="Department" asp-action="Edit" method="post" role="form">
+
     <div class="form-horizontal">
         <h4>Department</h4>
-        <hr/>
+        <hr />
         @*todo: add validation summary*@
+        <input type="hidden" asp-for="Id" />
+        @*todo: add for optimistic concurrency check:
+        <input type="hidden" asp-for="RowVersion" />*@
 
         <div class="form-group">
             <label asp-for="Name" class="col-md-2 control-label"></label>
             <div class="col-md-10">
-                <input asp-for="Name" class="form-control"/>
+                <input asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
         </div>
@@ -33,7 +37,7 @@
             <label asp-for="StartDate" class="col-md-2 control-label"></label>
             <div class="col-md-10">
                 @*need to set the initial value formatted as year-month-day to have it set*@
-                <input asp-for="StartDate" class="form-control" value='@Model.StartDate?.ToString("yyyy-MM-dd")' />
+                <input asp-for="StartDate" class="form-control" value='@Model.StartDate?.ToString("yyyy-MM-dd")'/>
                 <span asp-validation-for="StartDate" class="text-danger"></span>
             </div>
         </div>
@@ -46,15 +50,14 @@
             </div>
         </div>
 
-    </div>
-    <div class="form-group">
-        <div class="col-md-offset-2 col-md-10">
-            <input type="submit" value="Create" class="btn btn-default"/>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
         </div>
     </div>
 </form>
+
 <div>
     <a asp-action="Index">Back to List</a>
 </div>
-
-
