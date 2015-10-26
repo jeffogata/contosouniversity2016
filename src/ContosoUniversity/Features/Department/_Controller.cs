@@ -38,7 +38,7 @@
 
         public async Task<IActionResult> Delete(int id)
         {
-            var model = await Mediator.SendAsync(new Delete.Query(id));
+            var model = await Mediator.SendAsync(new Details.Query(id));
 
             return View(model);
         }
