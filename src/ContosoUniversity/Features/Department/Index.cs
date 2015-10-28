@@ -1,4 +1,6 @@
-﻿namespace ContosoUniversity.Features.Department
+﻿using Newtonsoft.Json;
+
+namespace ContosoUniversity.Features.Department
 {
     using System;
     using System.Collections.Generic;
@@ -26,10 +28,15 @@
 
             public class Department
             {
+                [JsonProperty("id")]
                 public int Id { get; set; }
+                [JsonProperty("name")]
                 public string Name { get; set; }
+                [JsonProperty("budget")]
                 public decimal Budget { get; set; }
+                [JsonProperty("startDate")]
                 public DateTime StartDate { get; set; }
+                [JsonProperty("administratorFullName")]
                 public string AdministratorFullName { get; set; }
             }
         }

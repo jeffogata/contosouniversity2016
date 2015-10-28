@@ -1,4 +1,7 @@
-﻿namespace ContosoUniversity
+﻿using Microsoft.Framework.Logging;
+using Serilog;
+
+namespace ContosoUniversity
 {
     using System;
     using System.Collections.Generic;
@@ -24,6 +27,16 @@
     {
         public Startup(IHostingEnvironment env, IApplicationEnvironment appEnv)
         {
+            Log.Logger = new LoggerConfiguration()
+#if DNXCORE50
+                .WriteTo.TextWriter(Console.Out)
+#else
+                .WriteTo.Trace()
+#endif
+                //.MinimumLevel.Debug()
+                .CreateLogger();
+
+
             var builder = new ConfigurationBuilder()
                 .SetBasePath(appEnv.ApplicationBasePath)
                 .AddJsonFile("config.json")
@@ -59,8 +72,11 @@
                 });
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
+            loggerFactory.AddSerilog();
+            //loggerFactory.MinimumLevel = LogLevel.Verbose;  // corresponds to Serilog's Debug
+            
             //if (env.IsDevelopment())
             //{
             //    app.UseBrowserLink();
