@@ -12,6 +12,7 @@
     using Microsoft.AspNet.Mvc.Rendering;
     using Microsoft.Data.Entity;
     using Models;
+    using Newtonsoft.Json;
 
     public class Create
     {
@@ -99,9 +100,13 @@
 
         public class Command : IAsyncRequest<int>
         {
+            [JsonProperty("name")]
             public string Name { get; set; }
+            [JsonProperty("budget")]
             public decimal? Budget { get; set; }
+            [JsonProperty("startDate")]
             public DateTime? StartDate { get; set; }
+            [JsonProperty("instructorId")]
             public int? InstructorId { get; set; }
         }
 
