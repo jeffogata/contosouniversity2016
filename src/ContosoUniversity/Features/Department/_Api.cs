@@ -3,10 +3,11 @@
     using System.Threading.Tasks;
     using Infrastructure;
     using Microsoft.AspNet.Mvc;
+    using Models;
 
     // todo: would be nice to have the route determined by convention
     [Route("api/department")]
-    public class _Api : MediatorController
+    public class _Api : MediatorController<Department, DepartmentDetailsQueryResponse>
     {
         [HttpGet]
         public async Task<IActionResult> GetAll()
@@ -17,7 +18,7 @@
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var department = await Mediator.SendAsync(new Details.Query(id));
+            var department = await Mediator.SendAsync(new DetailsQuery<Department, DepartmentDetailsQueryResponse>(id));
 
             if (department == null)
             {
@@ -28,9 +29,9 @@
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> ApiDelete(int id)
         {
-            await Mediator.SendAsync(new Delete.Command {Id = id});
+            await Mediator.SendAsync(new DeleteCommand<Department> {Id = id});
             return HttpNoContent();
         }
 

@@ -11,7 +11,7 @@
             CreateMap<Instructor, Create.QueryResponse.Instructor>();
             CreateMap<Department, Index.QueryResponse.Department>();
             CreateMap<Create.Command, Department>();
-            CreateMap<Department, Details.QueryResponse>();
+            CreateMap<Department, DepartmentDetailsQueryResponse>();
             CreateMap<Department, Edit.QueryResponse>();
         }
     }

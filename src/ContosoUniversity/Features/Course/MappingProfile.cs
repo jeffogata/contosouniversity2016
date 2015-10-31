@@ -8,7 +8,7 @@
         protected override void Configure()
         {
             CreateMap<Course, Index.QueryResponse.Course>();
-            CreateMap<Course, Details.QueryResponse>();
+            CreateMap<Course, CourseDetailsQueryResponse>();
             CreateMap<Course, Edit.QueryResponse>();
             CreateMap<Department, Create.QueryResponse.Department>();
             CreateMap<Create.Command, Course>();
