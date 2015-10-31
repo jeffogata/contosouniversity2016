@@ -76,18 +76,20 @@ namespace ContosoUniversity
         {
             loggerFactory.AddSerilog();
             //loggerFactory.MinimumLevel = LogLevel.Verbose;  // corresponds to Serilog's Debug
-            
-            //if (env.IsDevelopment())
-            //{
-            //    app.UseBrowserLink();
-            //    app.UseDeveloperExceptionPage();
-            //}
-            //else
-            //{
-            //    // Add Error handling middleware which catches all application specific errors and
-            //    // send the request to the following path or controller action.
-            //    app.UseExceptionHandler("/Home/Error");
-            //}
+
+            if (env.IsDevelopment())
+            {
+                app.UseBrowserLink();
+                app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                // Add Error handling middleware which catches all application specific errors and
+                // send the request to the following path or controller action.
+
+                // todo: add error page
+                app.UseExceptionHandler("/Home/Error");
+            }
 
             // bootstrap AutoMapper
             app.ConfigureAutoMapper();
