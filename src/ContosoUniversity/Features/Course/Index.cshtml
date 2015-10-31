@@ -1,9 +1,37 @@
 ﻿@model ContosoUniversity.Features.Course.Index.QueryResponse
 @{
-    ViewBag.Title = "Course Index";
+    ViewBag.Title = "Courses";
 }
 
 <h2>@ViewBag.Title</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+
+<form class="form-horizontal" role="form">
+    <p>
+        <div class="container">
+            <div class="col-lg-6">
+                <div class="input-group">
+                    <span class="input-group-addon">Department</span>
+                    <select asp-for="DepartmentId" asp-items="Model.Departments" class="form-control"></select>
+                    <button type="submit" class="btn-default btn">Filter</button>
+                </div>
+            </div>
+        </div>
+    </p>
+</form>
+
+@*
+    Note: in MVC 5, Html.DisplayNameFor would work with an IEnumerable of the model,
+    so we could get the display name of a model property in a <th>
+
+    the <label> tag helper in MVC 6 does not allow for this.  see the issue below
+    for more background, and a code example of a <th> tag helper:
+
+    https://github.com/aspnet/Mvc/issues/2387
+*@
 
 <table class="table">
     <tr>
