@@ -1,0 +1,61 @@
+﻿@model ContosoUniversity.Features.Course.Edit.QueryResponse
+
+@{
+    ViewBag.Title = "Edit";
+}
+
+<h2>Edit</h2>
+
+<form asp-controller="Course" asp-action="Edit" method="post" role="form">
+    <div class="form-horizontal">
+        <h4>Course</h4>
+        <hr />
+        <div asp-validation-summary="ValidationSummary.All" class="text-danger"></div>
+        <input type="hidden" asp-for="Id"/>
+
+        <div class="form-group">
+            <label asp-for="Number" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="Number" class="form-control" />
+                <span asp-validation-for="Number" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Title" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Credits" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="Credits" class="form-control" />
+                <span asp-validation-for="Credits" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="DepartmentId" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <select asp-for="DepartmentId" asp-items="Model.Departments" class="form-control"></select>
+                <span asp-validation-for="DepartmentId" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+</form>
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

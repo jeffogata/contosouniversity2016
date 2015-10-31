@@ -1,10 +1,9 @@
-﻿namespace ContosoUniversity.Features.Department
+﻿namespace ContosoUniversity.Features.Course
 {
-    using System;
-    using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
     using AutoMapper;
+    using AutoMapper.QueryableExtensions;
     using DataAccess;
     using Infrastructure;
     using MediatR;
@@ -37,47 +36,34 @@
 
             public override async Task<QueryResponse> Handle(Query message)
             {
-                var department = await DbContext.Departments
-                    .Include(x => x.Administrator)
+                var course = await DbContext.Courses
+                    .Include(x => x.Department)
                     .FirstOrDefaultAsync(x => x.Id == message.Id);
 
-                var response = Mapper.Map<QueryResponse>(department);
+                var response = Mapper.Map<QueryResponse>(course);
 
-                /*
-                    wanted to do:
-
-                        var instructors = await _dbContext.Instructors
-                            .OrderBy(i => i.LastName)
-                            .ProjectTo<Instructor>()
-                            .ToListAsync();
-
-                    but this returns instructors and students.  This
-                    works fine in the HS Contoso example against EF 6.
-                */
-
-                var instructors = await DbContext
-                    .Instructors
-                    .OrderBy(i => i.LastName)
+                var departments = await DbContext
+                    .Departments
+                    .OrderBy(d => d.Name)
+                    .ProjectTo<Create.QueryResponse.Department>()
                     .ToListAsync();
 
-                var mappedInstructors = Mapper.Map<List<Create.QueryResponse.Instructor>>(instructors);
-
-                var items = mappedInstructors.Select(x =>
+                var items = departments.Select(x =>
                     new SelectListItem
                     {
                         Value = x.Id.ToString(),
-                        Text = x.FullName
+                        Text = x.Name
                     }).ToList();
 
                 var nullItem = new SelectListItem
                 {
                     Value = "",
-                    Text = "",
-                    Selected = response?.InstructorId.HasValue != true
+                    Text = ""
                 };
 
                 items.Insert(0, nullItem);
-                response.Instructors = items;
+
+                response.Departments = items;
 
                 return response;
             }
@@ -87,14 +73,18 @@
         {
             [JsonProperty("id")]
             public int Id { get; set; }
-            [JsonProperty("name")]
-            public string Name { get; set; }
-            [JsonProperty("budget")]
-            public decimal Budget { get; set; }
-            [JsonProperty("startDate")]
-            public DateTime StartDate { get; set; }
-            [JsonProperty("instructorId")]
-            public int? InstructorId { get; set; }
+
+            [JsonProperty("number")]
+            public string Number { get; set; }
+
+            [JsonProperty("title")]
+            public string Title { get; set; }
+
+            [JsonProperty("credits")]
+            public int Credits { get; set; }
+
+            [JsonProperty("departmentId")]
+            public int DepartmentId { get; set; }
         }
 
         public class CommandHandler : MediatorHandler<Command, int>
@@ -105,16 +95,16 @@
 
             public override async Task<int> Handle(Command message)
             {
-                var department = DbContext.Departments.FirstOrDefault(x => x.Id == message.Id);
+                var course = DbContext.Courses.FirstOrDefault(x => x.Id == message.Id);
 
                 // todo: need to handle not found
 
-                if (department != null)
+                if (course != null)
                 {
-                    department.Name = message.Name;
-                    department.Budget = message.Budget;
-                    department.StartDate = message.StartDate;
-                    department.InstructorId = message.InstructorId;
+                    course.Number = message.Number;
+                    course.Title = message.Title;
+                    course.Credits = message.Credits;
+                    course.DepartmentId = message.DepartmentId;
 
                     return await DbContext.SaveChangesAsync();
                 }

@@ -12,7 +12,7 @@
     <div class="form-horizontal">
         <h4>Department</h4>
         <hr />
-        @*todo: add validation summary*@
+        <div asp-validation-summary="ValidationSummary.All" class="text-danger"></div>
         <input type="hidden" asp-for="Id" />
         @*todo: add for optimistic concurrency check:
         <input type="hidden" asp-for="RowVersion" />*@
@@ -61,3 +61,6 @@
 <div>
     <a asp-action="Index">Back to List</a>
 </div>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}
