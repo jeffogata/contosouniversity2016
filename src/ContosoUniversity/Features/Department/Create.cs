@@ -87,7 +87,6 @@
                         Text = x.FullName
                     }).ToList();
 
-
                 var nullItem = new SelectListItem
                 {
                     Value = "",

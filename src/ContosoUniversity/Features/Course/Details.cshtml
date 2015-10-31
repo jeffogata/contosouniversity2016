@@ -1,0 +1,46 @@
+﻿@model ContosoUniversity.Features.Course.Details.QueryResponse
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Course</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            <label asp-for="DepartmentName"></label>
+        </dt>
+        <dd>
+            @Model.DepartmentName
+        </dd>
+
+        <dt>
+            <label asp-for="Number"></label>
+        </dt>
+        <dd>
+            @Model.Number
+        </dd>
+
+        <dt>
+            <label asp-for="Title"></label>
+        </dt>
+        <dd>
+            @Model.Title
+        </dd>
+
+        <dt>
+            <label asp-for="Credits"></label>
+        </dt>
+        <dd>
+            @Model.Credits
+        </dd>
+
+    </dl>
+</div>
+<p>
+    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</p>
