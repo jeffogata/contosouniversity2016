@@ -10,6 +10,8 @@
             CreateMap<Instructor, Index.QueryResponse.Instructor>();
             CreateMap<Course, Index.QueryResponse.Course>();
             CreateMap<Enrollment, Index.QueryResponse.Enrollment>();
+            CreateMap<Instructor, Details.QueryResponse>();
+            CreateMap<Course, Create.QueryResponse.Course>();
         }
     }
 }

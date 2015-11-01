@@ -12,7 +12,6 @@
             return View(await Mediator.SendAsync(query));
         }
 
-        /*
         public async Task<IActionResult> Details(int id)
         {
             return View(await Mediator.SendAsync(new Details.Query(id)));
@@ -23,6 +22,7 @@
             return View(await Mediator.SendAsync(new Create.Query()));
         }
 
+        /*
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Create.Command model)
         {

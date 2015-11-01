@@ -7,7 +7,7 @@
 <h2>Instructors</h2>
 
 <p>
-    <a href="">Create New</a>
+    <a asp-action="Create">Create New</a>
 </p>
 <table class="table">
     <tr>
@@ -34,7 +34,7 @@
                 @item.FirstName
             </td>
             <td>
-                @item.HireDate
+                @item.HireDate?.ToString("d")
             </td>
             <td>
                 @item.OfficeAssignmentLocation

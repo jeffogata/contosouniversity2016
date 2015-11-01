@@ -1,0 +1,85 @@
+﻿@model ContosoUniversity.Features.Instructor.Create.QueryResponse
+
+@{
+    ViewBag.Title = "Create";
+}
+
+<h2>Create</h2>
+
+<form asp-controller="Course" asp-action="Create" method="post" class="form-horizontal" role="form">
+
+    <div class="form-horizontal">
+        <h4>Instructor</h4>
+        <hr />
+        <div asp-validation-summary="ValidationSummary.All" class="text-danger"></div>
+
+        <div class="form-group">
+            <label asp-for="LastName" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="LastName" class="form-control" />
+                <span asp-validation-for="LastName" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="FirstName" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="FirstName" class="form-control" />
+                <span asp-validation-for="FirstName" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="HireDate" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                @*need to set the initial value formatted as year-month-day to have it set*@
+                <input asp-for="HireDate" class="form-control" value='@Model.HireDate.ToString("yyyy-MM-dd")' />
+                <span asp-validation-for="HireDate" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="OfficeAssignmentLocation" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="OfficeAssignmentLocation" class="form-control" />
+                <span asp-validation-for="OfficeAssignmentLocation" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <table>
+                    <tr>
+                        @{
+                            int count = 0;
+
+                            foreach (var course in Model.AvailableCourses)
+                            {
+                                if (count++ % 3 == 0)
+                                {
+                                    @:</tr><tr>
+                                }
+                                @:<td>
+                                    <input type="checkbox" name="selectedCourses" value="@course.Id" />
+                                    @course.Number @:  @course.Title
+                                @:</td>
+                            }
+                            @:</tr>
+                        }
+                </table>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <button type="submit" class="btn btn-default">Create</button>
+            </div>
+        </div>
+    </div>
+</form>
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}
