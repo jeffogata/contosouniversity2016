@@ -58,7 +58,7 @@
 
 </table>
 
-@if (Model.Courses.Any())
+@if (Model.Courses != null)
 {
     <h3>Courses Taught by Selected Instructor</h3>
     <table class="table">
@@ -72,16 +72,16 @@
         @foreach (var item in Model.Courses)
         {
             string selectedRow = "";
-            if (item.CourseId == Model.CourseId)
+            if (item.Id == Model.CourseId)
             {
                 selectedRow = "success";
             }
             <tr class="@selectedRow">
                 <td>
-                    <a href="">Select</a>
+                    <a asp-action="Index" asp-route-id="@Model.InstructorId" asp-route-courseid="@item.Id">Select</a>
                 </td>
                 <td>
-                    @item.CourseId
+                    @item.Number
                 </td>
                 <td>
                     @item.Title
@@ -95,7 +95,7 @@
     </table>
 }
 
-@if (Model.Enrollments.Any())
+@if (Model.Enrollments != null)
 {
     <h3>
         Students Enrolled in Selected Course

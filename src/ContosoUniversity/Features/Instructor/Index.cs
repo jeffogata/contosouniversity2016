@@ -57,7 +57,8 @@
 
             public class Course
             {
-                public int CourseId { get; set; }
+                public int Id { get; set; }
+                public string Number { get; set; }
                 public string Title { get; set; }
                 public string DepartmentName { get; set; }
             }
@@ -119,35 +120,43 @@
 
                 // *** end workaround
 
-                var courses = new List<QueryResponse.Course>();
-                var enrollments = new List<QueryResponse.Enrollment>();
+                var response = new QueryResponse
+                {
+                    InstructorId = message.Id,
+                    CourseId = message.CourseId,
+                    Instructors = instructors
+                };
 
+                // include courses if an instructor was selected
                 if (message.Id != null)
                 {
+                    /*
+                    // the following query is throwing "InvalidOperationException: The EF.Property<T> method may only be used within LINQ queries."
+                    // see https://github.com/aspnet/EntityFramework/issues/3029
+                    // same error message, fixed on 2015-10-23, will have to test when i update to new build of asp.net 5
+
                     courses = await DbContext.Courses
                         .Where(c => c.CourseInstructors.Any(ci => ci.InstructorId == message.Id))
                         .ProjectTo<QueryResponse.Course>()
                         .ToListAsync();
+                    */
+                    response.Courses = await DbContext.Set<CourseInstructor>()
+                        .Where(ci => ci.InstructorId == message.Id)
+                        .Select(ci => ci.Course)
+                        .ProjectTo<QueryResponse.Course>()
+                        .ToListAsync();
                 }
 
+                // include enrollments if a course was selected
                 if (message.CourseId != null)
                 {
-                    enrollments = await DbContext.Enrollments
+                    response.Enrollments = await DbContext.Enrollments
                         .Where(x => x.CourseId == message.CourseId)
                         .ProjectTo<QueryResponse.Enrollment>()
                         .ToListAsync();
                 }
 
-                var viewModel = new QueryResponse
-                {
-                    Instructors = instructors,
-                    Courses = courses,
-                    Enrollments = enrollments,
-                    InstructorId = message.Id,
-                    CourseId = message.CourseId
-                };
-
-                return viewModel;
+                return response;
             }
         }
     }
