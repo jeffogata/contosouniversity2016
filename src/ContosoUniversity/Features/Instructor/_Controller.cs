@@ -22,7 +22,6 @@
             return View(await Mediator.SendAsync(new Create.Query()));
         }
 
-        /*
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Create.Command model)
         {
@@ -30,6 +29,7 @@
             return RedirectToAction("Index");
         }
 
+        /*
         public async Task<IActionResult> Edit(int id)
         {
             return View(await Mediator.SendAsync(new Edit.Query(id)));

@@ -13,6 +13,7 @@ namespace ContosoUniversity.Features.Instructor
     using MediatR;
     using Microsoft.AspNet.Mvc.Rendering;
     using Microsoft.Data.Entity;
+    using Models;
     using Newtonsoft.Json;
 
     public class Create
@@ -28,7 +29,7 @@ namespace ContosoUniversity.Features.Instructor
             public string LastName { get; set; }
 
             [Required, StringLength(50)]
-            [Display(Name = "Last Name")]
+            [Display(Name = "First Name")]
             public string FirstName { get; set; }
 
             [Required, DataType(DataType.Date)]
@@ -39,7 +40,7 @@ namespace ContosoUniversity.Features.Instructor
             [Display(Name = "Office Location")]
             public string OfficeAssignmentLocation { get; set; }
 
-            public List<Course> AvailableCourses { get; set; }
+            public List<Course> AvaliableCourses { get; set; }
 
             public class Course
             {
@@ -65,25 +66,26 @@ namespace ContosoUniversity.Features.Instructor
                 return new QueryResponse
                 {
                     HireDate = DateTime.Now.Date,
-                    AvailableCourses = courses
+                    AvaliableCourses = courses
                 };
             }
         }
 
-        /*
         public class Command : IAsyncRequest<int>
         {
-            [JsonProperty("number")]
-            public string Number { get; set; }
+            [JsonProperty("lastName")]
+            public string LastName { get; set; }
 
-            [JsonProperty("title")]
-            public string Title { get; set; }
+            [JsonProperty("firstName")]
+            public string FirstName { get; set; }
 
-            [JsonProperty("credits")]
-            public int Credits { get; set; }
+            [JsonProperty("hireDate")]
+            public DateTime HireDate { get; set; }
 
-            [JsonProperty("departmentId")]
-            public int DepartmentId { get; set; }
+            [JsonProperty("officeLocation")]
+            public string OfficeAssignmentLocation { get; set; }
+
+            public List<int> SelectedCourses { get; set; }
         }
 
         public class CommandHandler : MediatorHandler<Command, int>
@@ -94,13 +96,23 @@ namespace ContosoUniversity.Features.Instructor
 
             public override async Task<int> Handle(Command message)
             {
-                var course = Mapper.Map<Command, Course>(message);
+                var instructor = Mapper.Map<Instructor>(message);
 
-                DbContext.Courses.Add(course);
+                if (message.OfficeAssignmentLocation != null)
+                {
+                    instructor.OfficeAssignment = new OfficeAssignment {Location = message.OfficeAssignmentLocation};
+                }
+
+                if (message.SelectedCourses?.Any() == true)
+                {
+                    instructor.CourseInstructors =
+                        message.SelectedCourses.Select(c => new CourseInstructor {CourseId = c}).ToList();
+                }
+
+                DbContext.Instructors.Add(instructor);
 
                 return await DbContext.SaveChangesAsync();
             }
         }
-        */
     }
 }
