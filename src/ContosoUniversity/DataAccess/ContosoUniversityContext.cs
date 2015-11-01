@@ -30,7 +30,8 @@
             // https://github.com/aspnet/EntityFramework/issues/1368#issuecomment-126129034
             // see http://stackoverflow.com/a/29474030/409259
 
-            modelBuilder.Entity<CourseInstructor>().HasKey(x => new {x.CourseId, x.InstructorId});
+            modelBuilder.Entity<CourseInstructor>()
+                .HasKey(x => new {x.CourseId, x.InstructorId});
 
             base.OnModelCreating(modelBuilder);
         }
