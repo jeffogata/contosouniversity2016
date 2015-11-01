@@ -9,35 +9,38 @@
     using Models;
     using Newtonsoft.Json;
 
-    public class DepartmentDetailsQueryResponse
+    public class Details
     {
-        [JsonProperty("id")]
-        public int Id { get; set; }
-
-        [JsonProperty("administratorFullName")]
-        [Display(Name = "Administrator")]
-        public string AdministratorFullName { get; set; }
-
-        [JsonProperty("name")]
-        public string Name { get; set; }
-
-        [JsonProperty("budget")]
-        public decimal Budget { get; set; }
-
-        [JsonProperty("startDate")]
-        [Display(Name = "Start Date")]
-        public DateTime? StartDate { get; set; }
-    }
-
-    public class DepartmentDetailsQueryHandler : DetailsQueryHandler<Department, DepartmentDetailsQueryResponse>
-    {
-        public DepartmentDetailsQueryHandler(ContosoUniversityContext dbContext) : base(dbContext)
+        public class QueryModel
         {
+            [JsonProperty("id")]
+            public int Id { get; set; }
+
+            [JsonProperty("administratorFullName")]
+            [Display(Name = "Administrator")]
+            public string AdministratorFullName { get; set; }
+
+            [JsonProperty("name")]
+            public string Name { get; set; }
+
+            [JsonProperty("budget")]
+            public decimal Budget { get; set; }
+
+            [JsonProperty("startDate")]
+            [Display(Name = "Start Date")]
+            public DateTime? StartDate { get; set; }
         }
 
-        protected override IQueryable<Department> ModifyQuery(IQueryable<Department> query)
+        public class DepartmentDetailsQueryHandler : DetailsQueryHandler<Department, QueryModel>
         {
-            return query.Include(x => x.Administrator);
+            public DepartmentDetailsQueryHandler(ContosoUniversityContext dbContext) : base(dbContext)
+            {
+            }
+
+            protected override IQueryable<Department> ModifyQuery(IQueryable<Department> query)
+            {
+                return query.Include(x => x.Administrator);
+            }
         }
     }
 }

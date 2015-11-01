@@ -5,7 +5,7 @@
     using Microsoft.AspNet.Mvc;
     using Models;
 
-    public class _Controller : MediatorController<Department, DepartmentDetailsQueryResponse, DepartmentCreateQueryResponse>
+    public class _Controller : MediatorController<Department, Details.QueryModel, DepartmentCreateQueryResponse>
     {
         public async Task<IActionResult> Index()
         {

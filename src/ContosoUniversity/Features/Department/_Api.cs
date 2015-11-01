@@ -7,7 +7,7 @@
 
     // todo: would be nice to have the route determined by convention
     [Route("api/department")]
-    public class _Api : MediatorController<Department, DepartmentDetailsQueryResponse, DepartmentCreateQueryResponse>
+    public class _Api : MediatorController<Department, Details.QueryModel, DepartmentCreateQueryResponse>
     {
         [HttpGet]
         public async Task<IActionResult> GetAll()
@@ -18,7 +18,7 @@
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var department = await Mediator.SendAsync(new DetailsQuery<Department, DepartmentDetailsQueryResponse>(id));
+            var department = await Mediator.SendAsync(new DetailsQuery<Department, Details.QueryModel>(id));
 
             if (department == null)
             {

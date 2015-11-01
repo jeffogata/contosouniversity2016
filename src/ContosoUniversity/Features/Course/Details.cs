@@ -8,34 +8,37 @@
     using Models;
     using Newtonsoft.Json;
 
-    public class CourseDetailsQueryResponse
+    public class Details
     {
-        [JsonProperty("id")]
-        public int Id { get; set; }
-
-        [JsonProperty("number")]
-        public string Number { get; set; }
-
-        [JsonProperty("title")]
-        public string Title { get; set; }
-
-        [JsonProperty("credits")]
-        public int Credits { get; set; }
-
-        [JsonProperty("departmentName")]
-        [Display(Name = "Department")]
-        public string DepartmentName { get; set; }
-    }
-
-    public class CourseDetailsQueryHandler : DetailsQueryHandler<Course, CourseDetailsQueryResponse>
-    {
-        public CourseDetailsQueryHandler(ContosoUniversityContext dbContext) : base(dbContext)
+        public class QueryModel
         {
+            [JsonProperty("id")]
+            public int Id { get; set; }
+
+            [JsonProperty("number")]
+            public string Number { get; set; }
+
+            [JsonProperty("title")]
+            public string Title { get; set; }
+
+            [JsonProperty("credits")]
+            public int Credits { get; set; }
+
+            [JsonProperty("departmentName")]
+            [Display(Name = "Department")]
+            public string DepartmentName { get; set; }
         }
 
-        protected override IQueryable<Course> ModifyQuery(IQueryable<Course> query)
+        public class QueryHandler : DetailsQueryHandler<Course, QueryModel>
         {
-            return query.Include(x => x.Department);
+            public QueryHandler(ContosoUniversityContext dbContext) : base(dbContext)
+            {
+            }
+
+            protected override IQueryable<Course> ModifyQuery(IQueryable<Course> query)
+            {
+                return query.Include(x => x.Department);
+            }
         }
     }
 }
