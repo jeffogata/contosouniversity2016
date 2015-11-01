@@ -4,10 +4,17 @@
     using Infrastructure;
     using Models;
 
-    public class DepartmentDeleteCommandHandler : DeleteCommandHandler<Department>
+    public class Delete
     {
-        public DepartmentDeleteCommandHandler(ContosoUniversityContext dbContext) : base(dbContext)
+        public class Command : DeleteCommand
         {
+        }
+
+        public class CommandHandler : DeleteCommandHandler<Department, Command>
+        {
+            public CommandHandler(ContosoUniversityContext dbContext) : base(dbContext)
+            {
+            }
         }
     }
 }

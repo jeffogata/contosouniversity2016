@@ -19,6 +19,7 @@
         }
 
         protected ContosoUniversityContext DbContext { get; private set; }
+
         public abstract Task<TResponse> Handle(TRequest message);
     }
 }

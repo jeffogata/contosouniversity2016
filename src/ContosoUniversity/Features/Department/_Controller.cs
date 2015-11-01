@@ -3,9 +3,8 @@
     using System.Threading.Tasks;
     using Infrastructure;
     using Microsoft.AspNet.Mvc;
-    using Models;
 
-    public class _Controller : MediatorController<Department, Details.QueryModel, DepartmentCreateQueryResponse>
+    public class _Controller : MediatorController
     {
         public async Task<IActionResult> Index()
         {
@@ -17,9 +16,9 @@
             return View(await Mediator.SendAsync(new Details.Query(id)));
         }
 
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Create()
         {
-            return View(await Mediator.SendAsync(new Details.Query(id)));
+            return View(await Mediator.SendAsync(new Create.Query()));
         }
 
         [HttpPost, ValidateAntiForgeryToken]
@@ -36,6 +35,18 @@
 
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Edit.Command model)
+        {
+            await Mediator.SendAsync(model);
+            return RedirectToAction("Index");
+        }
+
+        public async Task<IActionResult> Delete(int id)
+        {
+            return View(await Mediator.SendAsync(new Details.Query(id)));
+        }
+
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(Delete.Command model)
         {
             await Mediator.SendAsync(model);
             return RedirectToAction("Index");

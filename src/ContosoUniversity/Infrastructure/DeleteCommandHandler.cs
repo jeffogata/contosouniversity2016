@@ -4,22 +4,19 @@
     using DataAccess;
     using Models;
 
-    /* 
-        need to figure out how to register the generic command handler, then
-        this class can be made concrete and the concrete subclasses can be removed
-    */
-    public abstract class DeleteCommandHandler<T> : MediatorHandler<DeleteCommand<T>, int>
-        where T : Entity, new()
+    public abstract class DeleteCommandHandler<TEntity, TCommand> : MediatorHandler<TCommand, int>
+        where TEntity : Entity, new()
+        where TCommand : DeleteCommand
     {
         protected DeleteCommandHandler(ContosoUniversityContext dbContext) : base(dbContext)
         {
         }
 
-        public override async Task<int> Handle(DeleteCommand<T> message)
+        public override async Task<int> Handle(TCommand message)
         {
-            var target = new T { Id = message.Id };
+            var target = new TEntity { Id = message.Id };
 
-            DbContext.Set<T>().Remove(target);
+            DbContext.Set<TEntity>().Remove(target);
 
             return await DbContext.SaveChangesAsync();
         }

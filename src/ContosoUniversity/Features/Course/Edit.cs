@@ -23,7 +23,7 @@
             public int Id { get; set; }
         }
 
-        public class QueryResponse : CourseCreateQueryResponse
+        public class QueryResponse : Create.QueryResponse
         {
             public int Id { get; set; }
         }
@@ -45,7 +45,7 @@
                 var departments = await DbContext
                     .Departments
                     .OrderBy(d => d.Name)
-                    .ProjectTo<CourseCreateQueryResponse.Department>()
+                    .ProjectTo<Create.QueryResponse.Department>()
                     .ToListAsync();
 
                 var items = departments.Select(x =>

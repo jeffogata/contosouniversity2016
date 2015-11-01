@@ -52,9 +52,9 @@
             }
         }
 
-        public class Handler : MediatorHandler<Query, QueryResponse>
+        public class QueryHandler : MediatorHandler<Query, QueryResponse>
         {
-            public Handler(ContosoUniversityContext dbContext) : base(dbContext)
+            public QueryHandler(ContosoUniversityContext dbContext) : base(dbContext)
             {
             }
 

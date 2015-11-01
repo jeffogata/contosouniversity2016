@@ -14,68 +14,75 @@
     using Models;
     using Newtonsoft.Json;
 
-    public class CourseCreateQueryResponse
-    {
-        [StringLength(5)]
-        [Required]
-        public string Number { get; set; }
-
-        [StringLength(50, MinimumLength = 3)]
-        [Required]
-        public string Title { get; set; }
-
-        [Required]
-        public int Credits { get; set; }
-
-        [Display(Name = "Department")]
-        [Required]
-        public int DepartmentId { get; set; }
-
-        public List<SelectListItem> Departments { get; set; }
-
-        public class Department
-        {
-            public int Id { get; set; }
-            public string Name { get; set; }
-        }
-    }
-
-    public class CourseCreateQueryHandler : CreateQueryHandler<Course, CourseCreateQueryResponse>
-    {
-        public CourseCreateQueryHandler(ContosoUniversityContext dbContext) : base(dbContext)
-        {
-        }
-
-        protected override async Task ModifyResponse(CourseCreateQueryResponse response)
-        {
-            var departments = await DbContext
-                .Departments
-                .OrderBy(d => d.Name)
-                .ProjectTo<CourseCreateQueryResponse.Department>()
-                .ToListAsync();
-
-            var items = departments.Select(x =>
-                new SelectListItem
-                {
-                    Value = x.Id.ToString(),
-                    Text = x.Name
-                }).ToList();
-
-            var nullItem = new SelectListItem
-            {
-                Value = "",
-                Text = "",
-                Selected = true
-            };
-
-            items.Insert(0, nullItem);
-
-            response.Departments = items;
-        }
-    }
-
     public class Create
     {
+        public class Query : IAsyncRequest<QueryResponse>
+        {
+        }
+
+        public class QueryResponse
+        {
+            [StringLength(5)]
+            [Required]
+            public string Number { get; set; }
+
+            [StringLength(50, MinimumLength = 3)]
+            [Required]
+            public string Title { get; set; }
+
+            [Required]
+            public int Credits { get; set; }
+
+            [Display(Name = "Department")]
+            [Required]
+            public int DepartmentId { get; set; }
+
+            public List<SelectListItem> Departments { get; set; }
+
+            public class Department
+            {
+                public int Id { get; set; }
+                public string Name { get; set; }
+            }
+        }
+
+        public class QueryHandler : MediatorHandler<Query, QueryResponse>
+        {
+            public QueryHandler(ContosoUniversityContext dbContext) : base(dbContext)
+            {
+            }
+
+            public override async Task<QueryResponse> Handle(Query message)
+            {
+                var departments = await DbContext
+                    .Departments
+                    .OrderBy(d => d.Name)
+                    .ProjectTo<QueryResponse.Department>()
+                    .ToListAsync();
+
+                var items = departments.Select(x =>
+                    new SelectListItem
+                    {
+                        Value = x.Id.ToString(),
+                        Text = x.Name
+                    }).ToList();
+
+                var nullItem = new SelectListItem
+                {
+                    Value = "",
+                    Text = "",
+                    Selected = true
+                };
+
+                items.Insert(0, nullItem);
+
+                return new QueryResponse
+                {
+                    Departments = items
+                };
+            }
+        }
+
         public class Command : IAsyncRequest<int>
         {
             [JsonProperty("number")]
