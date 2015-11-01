@@ -5,16 +5,11 @@
     using Microsoft.AspNet.Mvc;
     using Models;
 
-    public class _Controller : MediatorController<Department, DepartmentDetailsQueryResponse>
+    public class _Controller : MediatorController<Department, DepartmentDetailsQueryResponse, DepartmentCreateQueryResponse>
     {
         public async Task<IActionResult> Index()
         {
             return View(await Mediator.SendAsync(new Index.Query()));
-        }
-
-        public async Task<IActionResult> Create()
-        {
-            return View(await Mediator.SendAsync(new Create.Query()));
         }
 
         [HttpPost, ValidateAntiForgeryToken]

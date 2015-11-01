@@ -5,7 +5,7 @@
     using Microsoft.AspNet.Mvc;
     using Models;
 
-    public class _Controller : MediatorController<Course, CourseDetailsQueryResponse>
+    public class _Controller : MediatorController<Course, CourseDetailsQueryResponse, CourseCreateQueryResponse>
     {
         public async Task<IActionResult> Index(Index.Query query)
         {
@@ -22,10 +22,6 @@
         {
             await Mediator.SendAsync(model);
             return RedirectToAction("Index");
-        }
-        public async Task<IActionResult> Create()
-        {
-            return View(await Mediator.SendAsync(new Create.Query()));
         }
 
         [HttpPost, ValidateAntiForgeryToken]

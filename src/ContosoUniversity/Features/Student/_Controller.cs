@@ -5,7 +5,7 @@
     using Microsoft.AspNet.Mvc;
     using Models;
 
-    public class _Controller : MediatorController<Student, object>
+    public class _Controller : MediatorController<Student, object, object>
     {
         public async Task<IActionResult> Index(Index.Query query)
         {

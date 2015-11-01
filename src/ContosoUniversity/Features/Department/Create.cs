@@ -15,95 +15,88 @@
     using Models;
     using Newtonsoft.Json;
 
+    public class DepartmentCreateQueryResponse
+    {
+        [StringLength(50, MinimumLength = 3)]
+        [Required]
+        public string Name { get; set; }
+
+        [DataType(DataType.Currency)]
+        [Column(TypeName = "money")]
+        public decimal Budget { get; set; }
+        // need the DataType attribute to have the datepicker rendered
+        [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
+        [Display(Name = "Start Date")]
+        public DateTime? StartDate { get; set; }
+
+        [Display(Name = "Administrator")]
+        public int? InstructorId { get; set; }
+        public List<SelectListItem> Instructors { get; set; }
+
+        public class Instructor
+        {
+            public int Id { get; set; }
+            public string FirstName { get; set; }
+            public string LastName { get; set; }
+
+            public string FullName
+            {
+                get { return $"{LastName}, {FirstName}"; }
+            }
+        }
+    }
+
+    public class CourseCreateQueryHandler : CreateQueryHandler<Department, DepartmentCreateQueryResponse>
+    {
+        public CourseCreateQueryHandler(ContosoUniversityContext dbContext) : base(dbContext)
+        {
+        }
+
+        protected override async Task ModifyResponse(DepartmentCreateQueryResponse response)
+        {
+            /*
+                wanted to do:
+
+                    var instructors = await _dbContext.Instructors
+                        .OrderBy(i => i.LastName)
+                        .ProjectTo<Instructor>()
+                        .ToListAsync();
+
+                but this returns instructors and students.  This
+                works fine in the HS Contoso example against EF 6.
+            */
+
+            var instructors = await DbContext
+                .Instructors
+                .OrderBy(i => i.LastName)
+                .ToListAsync();
+
+            var result = Mapper.Map<List<DepartmentCreateQueryResponse.Instructor>>(instructors);
+
+            var items = result.Select(x =>
+                new SelectListItem
+                {
+                    Value = x.Id.ToString(),
+                    Text = x.FullName
+                }).ToList();
+
+            var nullItem = new SelectListItem
+            {
+                Value = "",
+                Text = "",
+                Selected = true
+            };
+
+            items.Insert(0, nullItem);
+
+            response.StartDate = DateTime.Now.Date;
+            response.Instructors = items;
+        }
+    }
+
     public class Create
     {
-        public class Query : IAsyncRequest<QueryResponse>
-        {
-        }
-
-        public class QueryResponse
-        {
-            [StringLength(50, MinimumLength = 3)]
-            [Required]
-            public string Name { get; set; }
-
-            [DataType(DataType.Currency)]
-            [Column(TypeName = "money")]
-            public decimal Budget { get; set; }
-            // need the DataType attribute to have the datepicker rendered
-            [DataType(DataType.Date)]
-            [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
-            [Display(Name = "Start Date")]
-            public DateTime? StartDate { get; set; }
-
-            [Display(Name = "Administrator")]
-            public int? InstructorId { get; set; }
-            public List<SelectListItem> Instructors { get; set; }
-
-            public class Instructor
-            {
-                public int Id { get; set; }
-                public string FirstName { get; set; }
-                public string LastName { get; set; }
-
-                public string FullName
-                {
-                    get { return $"{LastName}, {FirstName}"; }
-                }
-            }
-        }
-
-        public class QueryHandler : MediatorHandler<Query, QueryResponse>
-        {
-            public QueryHandler(ContosoUniversityContext dbContext) : base(dbContext)
-            {
-            }
-
-            public override async Task<QueryResponse> Handle(Query message)
-            {
-                /*
-                    wanted to do:
-
-                        var instructors = await _dbContext.Instructors
-                            .OrderBy(i => i.LastName)
-                            .ProjectTo<Instructor>()
-                            .ToListAsync();
-
-                    but this returns instructors and students.  This
-                    works fine in the HS Contoso example against EF 6.
-                */
-
-                var instructors = await DbContext
-                    .Instructors
-                    .OrderBy(i => i.LastName)
-                    .ToListAsync();
-
-                var result = Mapper.Map<List<QueryResponse.Instructor>>(instructors);
-
-                var items = result.Select(x =>
-                    new SelectListItem
-                    {
-                        Value = x.Id.ToString(),
-                        Text = x.FullName
-                    }).ToList();
-
-                var nullItem = new SelectListItem
-                {
-                    Value = "",
-                    Text = "",
-                    Selected = true
-                };
-
-                items.Insert(0, nullItem);
-
-                return new QueryResponse
-                {
-                    StartDate = DateTime.Now.Date,
-                    Instructors = items
-                };
-            }
-        }
-
         public class Command : IAsyncRequest<int>
         {
             [JsonProperty("name")]

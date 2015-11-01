@@ -24,7 +24,7 @@
             public int Id { get; set; }
         }
 
-        public class QueryResponse : Create.QueryResponse
+        public class QueryResponse : DepartmentCreateQueryResponse
         {
             public int Id { get; set; }
         }
@@ -60,7 +60,7 @@
                     .OrderBy(i => i.LastName)
                     .ToListAsync();
 
-                var mappedInstructors = Mapper.Map<List<Create.QueryResponse.Instructor>>(instructors);
+                var mappedInstructors = Mapper.Map<List<DepartmentCreateQueryResponse.Instructor>>(instructors);
 
                 var items = mappedInstructors.Select(x =>
                     new SelectListItem

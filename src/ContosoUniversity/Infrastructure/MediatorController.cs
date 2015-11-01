@@ -5,12 +5,17 @@
     using Microsoft.AspNet.Mvc;
     using Models;
 
-    public abstract class MediatorController<TEntity, TEntityView> : Controller
+    public abstract class MediatorController<TEntity, TEntityView, TCreateView> : Controller
         where TEntity : Entity
     {
         // note:  must have a public setter to be set for [FromServices]
         [FromServices]
         public IMediator Mediator { get; set; }
+
+        public async Task<IActionResult> Create()
+        {
+            return View(await Mediator.SendAsync(new CreateQuery<TEntity, TCreateView>()));
+        }
 
         public async Task<IActionResult> Details(int id)
         {

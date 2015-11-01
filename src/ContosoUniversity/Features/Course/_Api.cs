@@ -7,7 +7,7 @@
 
     // todo: would be nice to have the route determined by convention
     [Route("api/course")]
-    public class _Api : MediatorController<Course, CourseDetailsQueryResponse>
+    public class _Api : MediatorController<Course, CourseDetailsQueryResponse, CourseCreateQueryResponse>
     {
         [HttpGet]
         public async Task<IActionResult> GetAll()

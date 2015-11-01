@@ -10,7 +10,7 @@
             CreateMap<Course, Index.QueryResponse.Course>();
             CreateMap<Course, CourseDetailsQueryResponse>();
             CreateMap<Course, Edit.QueryResponse>();
-            CreateMap<Department, Create.QueryResponse.Department>();
+            CreateMap<Department, CourseCreateQueryResponse.Department>();
             CreateMap<Create.Command, Course>();
 
         }
