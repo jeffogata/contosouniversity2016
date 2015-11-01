@@ -1,16 +1,19 @@
 ﻿namespace ContosoUniversity.Infrastructure
 {
     using MediatR;
-    using Models;
 
-    public class DetailsQuery<TEntity, TResponse> : IAsyncRequest<TResponse>
-        where TEntity : Entity
+    public abstract class DetailsQuery<TQueryModel> : IAsyncRequest<TQueryModel>
     {
-        public DetailsQuery(int id)
+        private readonly int _id;
+
+        protected DetailsQuery(int id)
         {
-            Id = id;
+            _id = id;
         }
 
-        public int Id { get; set; }
+        public int Id
+        {
+            get { return _id; }
+        }
     }
 }

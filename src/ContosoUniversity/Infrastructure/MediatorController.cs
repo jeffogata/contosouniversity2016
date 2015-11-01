@@ -17,16 +17,6 @@
             return View(await Mediator.SendAsync(new CreateQuery<TEntity, TCreateView>()));
         }
 
-        public async Task<IActionResult> Details(int id)
-        {
-            return View(await Mediator.SendAsync(new DetailsQuery<TEntity, TEntityView>(id)));
-        }
-
-        public async Task<IActionResult> Delete(int id)
-        {
-            return View(await Mediator.SendAsync(new DetailsQuery<TEntity, TEntityView>(id)));
-        }
-
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(DeleteCommand<TEntity> model)
         {

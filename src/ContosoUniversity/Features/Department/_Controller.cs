@@ -12,6 +12,16 @@
             return View(await Mediator.SendAsync(new Index.Query()));
         }
 
+        public async Task<IActionResult> Details(int id)
+        {
+            return View(await Mediator.SendAsync(new Details.Query(id)));
+        }
+
+        public async Task<IActionResult> Delete(int id)
+        {
+            return View(await Mediator.SendAsync(new Details.Query(id)));
+        }
+
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Create.Command model)
         {

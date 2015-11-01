@@ -18,7 +18,7 @@
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var course = await Mediator.SendAsync(new DetailsQuery<Course, Details.QueryModel>(id));
+            var course = await Mediator.SendAsync(new Details.Query(id));
 
             if (course == null)
             {

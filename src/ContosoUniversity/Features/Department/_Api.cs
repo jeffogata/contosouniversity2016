@@ -18,7 +18,7 @@
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var department = await Mediator.SendAsync(new DetailsQuery<Department, Details.QueryModel>(id));
+            var department = await Mediator.SendAsync(new Details.Query(id));
 
             if (department == null)
             {

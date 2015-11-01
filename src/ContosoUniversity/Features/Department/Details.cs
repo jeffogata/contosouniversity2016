@@ -11,6 +11,13 @@
 
     public class Details
     {
+        public class Query : DetailsQuery<QueryModel>
+        {
+            public Query(int id) : base(id)
+            {
+            }
+        }
+
         public class QueryModel
         {
             [JsonProperty("id")]
@@ -31,9 +38,9 @@
             public DateTime? StartDate { get; set; }
         }
 
-        public class DepartmentDetailsQueryHandler : DetailsQueryHandler<Department, QueryModel>
+        public class QueryHandler : DetailsQueryHandler<Department, Query, QueryModel>
         {
-            public DepartmentDetailsQueryHandler(ContosoUniversityContext dbContext) : base(dbContext)
+            public QueryHandler(ContosoUniversityContext dbContext) : base(dbContext)
             {
             }
 

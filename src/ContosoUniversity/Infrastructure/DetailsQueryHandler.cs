@@ -7,15 +7,15 @@
     using Microsoft.Data.Entity;
     using Models;
 
-    public abstract class DetailsQueryHandler<TEntity, TResponse> :
-        MediatorHandler<DetailsQuery<TEntity, TResponse>, TResponse>
+    public abstract class DetailsQueryHandler<TEntity, TQuery, TQueryModel> : MediatorHandler<TQuery, TQueryModel>
         where TEntity : Entity
+        where TQuery : DetailsQuery<TQueryModel>
     {
         protected DetailsQueryHandler(ContosoUniversityContext dbContext) : base(dbContext)
         {
         }
 
-        public override async Task<TResponse> Handle(DetailsQuery<TEntity, TResponse> message)
+        public override async Task<TQueryModel> Handle(TQuery message)
         {
             var query = DbContext.Set<TEntity>().AsQueryable();
 
@@ -23,7 +23,7 @@
 
             var entity = await query.FirstOrDefaultAsync(x => x.Id == message.Id);
 
-            var result = Mapper.Map<TResponse>(entity);
+            var result = Mapper.Map<TQueryModel>(entity);
 
             return result;
         }

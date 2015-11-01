@@ -10,6 +10,13 @@
 
     public class Details
     {
+        public class Query : DetailsQuery<QueryModel>
+        {
+            public Query(int id) : base(id)
+            {
+            }
+        }
+
         public class QueryModel
         {
             [JsonProperty("id")]
@@ -29,7 +36,7 @@
             public string DepartmentName { get; set; }
         }
 
-        public class QueryHandler : DetailsQueryHandler<Course, QueryModel>
+        public class QueryHandler : DetailsQueryHandler<Course, Query, QueryModel>
         {
             public QueryHandler(ContosoUniversityContext dbContext) : base(dbContext)
             {
