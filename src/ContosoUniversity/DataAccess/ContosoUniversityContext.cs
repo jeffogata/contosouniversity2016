@@ -33,6 +33,11 @@
             modelBuilder.Entity<CourseInstructor>()
                 .HasKey(x => new {x.CourseId, x.InstructorId});
 
+            modelBuilder.Entity<OfficeAssignment>()
+                .HasOne(x => x.Instructor)
+                .WithOne(x => x.OfficeAssignment)
+                .WillCascadeOnDelete();
+
             base.OnModelCreating(modelBuilder);
         }
 

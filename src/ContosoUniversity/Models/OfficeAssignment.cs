@@ -6,7 +6,7 @@
     public class OfficeAssignment
     {
         [Key]
-        [ForeignKey("Instructor")]
+        //[ForeignKey("Instructor")]
         public int InstructorId { get; set; }
 
         [StringLength(50)]

@@ -3,7 +3,6 @@
     using System.Threading.Tasks;
     using Infrastructure;
     using Microsoft.AspNet.Mvc;
-    using Models;
 
     public class _Controller : MediatorController
     {
@@ -40,7 +39,7 @@
             await Mediator.SendAsync(model);
             return RedirectToAction("Index");
         }
-/*
+
         public async Task<IActionResult> Delete(int id)
         {
             return View(await Mediator.SendAsync(new Details.Query(id)));
@@ -52,6 +51,5 @@
             await Mediator.SendAsync(model);
             return RedirectToAction("Index");
         }
-        */
     }
 }
