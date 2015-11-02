@@ -1,17 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace ContosoUniversity.Features.Instructor
+﻿namespace ContosoUniversity.Features.Instructor
 {
+    using System;
+    using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
+    using System.Linq;
+    using System.Threading.Tasks;
     using AutoMapper;
     using AutoMapper.QueryableExtensions;
     using DataAccess;
     using Infrastructure;
     using MediatR;
-    using Microsoft.AspNet.Mvc.Rendering;
     using Microsoft.Data.Entity;
     using Models;
     using Newtonsoft.Json;
@@ -35,7 +33,7 @@ namespace ContosoUniversity.Features.Instructor
             [Required, DataType(DataType.Date)]
             [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
             [Display(Name = "Hire Date")]
-            public DateTime HireDate { get; set; }
+            public DateTime? HireDate { get; set; }
 
             [Display(Name = "Office Location")]
             public string OfficeAssignmentLocation { get; set; }
@@ -47,6 +45,7 @@ namespace ContosoUniversity.Features.Instructor
                 public int Id { get; set; }
                 public string Number { get; set; }
                 public string Title { get; set; }
+                public bool Assigned { get; set; }
             }
         }
 

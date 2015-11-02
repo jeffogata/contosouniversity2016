@@ -13,6 +13,7 @@
             CreateMap<Instructor, Details.QueryResponse>();
             CreateMap<Course, Create.QueryResponse.Course>();
             CreateMap<Create.Command, Instructor>();
+            CreateMap<Instructor, Edit.QueryResponse>();
         }
     }
 }
