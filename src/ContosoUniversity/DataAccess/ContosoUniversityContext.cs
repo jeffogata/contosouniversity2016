@@ -47,5 +47,7 @@
         public DbSet<OfficeAssignment> OfficeAssignments { get; set; }
 
         public DbSet<Student> Students { get; set; }
+
+        public DbSet<CourseInstructor> CourseInstructors { get; set; } 
     }
 }

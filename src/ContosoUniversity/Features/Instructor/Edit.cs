@@ -1,15 +1,12 @@
 ﻿namespace ContosoUniversity.Features.Instructor
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
     using AutoMapper;
-    using AutoMapper.QueryableExtensions;
     using DataAccess;
     using Infrastructure;
     using MediatR;
-    using Microsoft.AspNet.Mvc.Rendering;
     using Microsoft.Data.Entity;
     using Models;
     using Newtonsoft.Json;
@@ -56,10 +53,10 @@
                 var courses = await (
                     from c in DbContext.Courses
                     from ci in DbContext.Set<CourseInstructor>()
-                                        .Where(ci => ci.CourseId == c.Id && ci.InstructorId == message.Id)
-                                        .DefaultIfEmpty()
+                        .Where(ci => ci.CourseId == c.Id && ci.InstructorId == message.Id)
+                        .DefaultIfEmpty()
                     orderby c.Number
-                    select new 
+                    select new
                     {
                         Course = c,
                         CourseInstructor = ci
@@ -78,19 +75,10 @@
             }
         }
 
-        /*
-        public class Command : IAsyncRequest<int>
+        public class Command : Create.Command
         {
             [JsonProperty("id")]
             public int Id { get; set; }
-            [JsonProperty("name")]
-            public string Name { get; set; }
-            [JsonProperty("budget")]
-            public decimal Budget { get; set; }
-            [JsonProperty("startDate")]
-            public DateTime StartDate { get; set; }
-            [JsonProperty("instructorId")]
-            public int? InstructorId { get; set; }
         }
 
         public class CommandHandler : MediatorHandler<Command, int>
@@ -101,23 +89,67 @@
 
             public override async Task<int> Handle(Command message)
             {
-                var department = DbContext.Departments.FirstOrDefault(x => x.Id == message.Id);
+                /* Including CourseInstructors throws an exception:
 
-                // todo: need to handle not found
+                        SqlException: Invalid column name 'Id'.
+                        System.Data.SqlClient.SqlCommand.<> c__DisplayClass16.< ExecuteDbDataReaderAsync > b__17(Task`1 result)
 
-                if (department != null)
+                        AggregateException: One or more errors occurred.
+                        System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+
+                    todo:  create a simple repro and capture the generated sql
+                */
+
+                var instructor = await DbContext.Instructors
+                    .Include(i => i.OfficeAssignment)
+                    //.Include(i => i.CourseInstructors)
+                    .SingleOrDefaultAsync(i => i.Id == message.Id);
+
+                // todo:  handle not found
+
+                instructor.LastName = message.LastName;
+                instructor.FirstName = message.FirstName;
+                instructor.HireDate = message.HireDate;
+
+                UpdateOfficeAssignment(message.OfficeAssignmentLocation, instructor);
+                UpdateAssignedCourses(message.SelectedCourses, instructor);
+
+                return await DbContext.SaveChangesAsync();
+            }
+
+            private void UpdateOfficeAssignment(string location, Instructor instructor)
+            {
+                if (location == null && instructor.OfficeAssignment == null)
                 {
-                    department.Name = message.Name;
-                    department.Budget = message.Budget;
-                    department.StartDate = message.StartDate;
-                    department.InstructorId = message.InstructorId;
-
-                    return await DbContext.SaveChangesAsync();
+                    return;
                 }
 
-                return 0;
+                if (instructor.OfficeAssignment == null)
+                {
+                    instructor.OfficeAssignment = new OfficeAssignment();
+                }
+
+                instructor.OfficeAssignment.Location = location;
+            }
+
+            private void UpdateAssignedCourses(List<int> assigned, Instructor instructor)
+            {
+                var courses = DbContext.CourseInstructors;
+
+                if (assigned == null || !assigned.Any())
+                {
+                    courses.RemoveRange(courses.Where(x => x.InstructorId == instructor.Id));
+                    return;
+                }
+
+                courses.RemoveRange(courses.Where(x => x.InstructorId == instructor.Id && !assigned.Contains(x.CourseId)));
+                courses.AddRange(
+                    assigned
+                        .Except(
+                            courses.Where(c => c.InstructorId == instructor.Id)
+                                .Select(c => c.CourseId))
+                        .Select(x => new CourseInstructor {InstructorId = instructor.Id, CourseId = x}));
             }
         }
-        */
     }
 }

@@ -33,14 +33,14 @@
         {
             return View(await Mediator.SendAsync(new Edit.Query(id)));
         }
-        /*
+
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Edit.Command model)
         {
             await Mediator.SendAsync(model);
             return RedirectToAction("Index");
         }
-
+/*
         public async Task<IActionResult> Delete(int id)
         {
             return View(await Mediator.SendAsync(new Details.Query(id)));

@@ -84,6 +84,7 @@
             [JsonProperty("officeLocation")]
             public string OfficeAssignmentLocation { get; set; }
 
+            [JsonProperty("selectedCourses")]
             public List<int> SelectedCourses { get; set; }
         }
 
