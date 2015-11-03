@@ -1,4 +1,6 @@
-﻿@model ContosoUniversity.Features.Student.Index.QueryResponse
+﻿@using Microsoft.Data.Entity.Metadata
+@using Microsoft.Framework.DependencyInjection
+@model ContosoUniversity.Features.Student.Index.QueryResponse
 @{
     ViewBag.Title = "Students";
 }
@@ -18,13 +20,13 @@
 <table class="table">
     <tr>
         <th>
-            Last Name
+            <a asp-route-searchstring="@Model.SearchString" asp-route-sorton="@ContosoUniversity.Features.Student.Index.SortOn.LastName" asp-route-sortascending="@true">Last Name</a>
         </th>
         <th>
-            First Name
+            <a asp-route-searchstring="@Model.SearchString" asp-route-sorton="@ContosoUniversity.Features.Student.Index.SortOn.FirstName" asp-route-sortascending="@true">First Name</a>
         </th>
         <th>
-            Enrollment Date
+            <a asp-route-searchstring="@Model.SearchString" asp-route-sorton="@ContosoUniversity.Features.Student.Index.SortOn.EnrollmentDate" asp-route-sortascending="@true">Enrollment Date</a>
         </th>
         <th></th>
     </tr>

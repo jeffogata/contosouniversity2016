@@ -4,29 +4,37 @@
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
     using System.Linq;
+    using System.Linq.Expressions;
     using System.Threading.Tasks;
     using AutoMapper;
     using DataAccess;
     using Infrastructure;
     using MediatR;
     using Microsoft.Data.Entity;
+    using Models;
 
     public class Index
     {
+        public enum SortOn
+        {
+            None,
+            LastName,
+            FirstName,
+            EnrollmentDate
+        }
+
         public class Query : IAsyncRequest<QueryResponse>
         {
-            public string SortOrder { get; set; }
-            public string CurrentFilter { get; set; }
+            public SortOn SortOn { get; set; }
+            public bool SortAscending { get; set; }
             public string SearchString { get; set; }
             public int? Page { get; set; }
         }
 
         public class QueryResponse
         {
-            public string CurrentSort { get; set; }
-            public string NameSortParm { get; set; }
-            public string DateSortParm { get; set; }
-            public string CurrentFilter { get; set; }
+            public SortOn CurrentSort { get; set; }
+            public bool SortAscending { get; set; }
             public string SearchString { get; set; }
             public int Page { get; set; }
             public int PageCount { get; set; }
@@ -38,7 +46,10 @@
                 [Display(Name = "First Name")]
                 public string FirstName { get; set; }
 
+                [Display(Name = "Last Name")]
                 public string LastName { get; set; }
+
+                [Display(Name = "Enrollment Date")]
                 public DateTime? EnrollmentDate { get; set; }
             }
         }
@@ -53,11 +64,10 @@
             {
                 var response = new QueryResponse
                 {
-                    CurrentSort = message.SortOrder,
-                    NameSortParm = string.IsNullOrEmpty(message.SortOrder) ? "name_desc" : "",
-                    DateSortParm = message.SortOrder == "Date" ? "date_desc" : "Date",
+                    CurrentSort = message.SortOn,
+                    SortAscending = message.SortAscending,
+                    SearchString = message.SearchString,
                     Page = message.Page ?? 1,
-                    SearchString = message.SearchString
                 };
 
                 var query = DbContext.Students.AsQueryable();
@@ -68,25 +78,31 @@
                                           || s.FirstName.Contains(message.SearchString));
                 }
 
-                switch (message.SortOrder)
+                // count will be used to calculate pagecount later on
+                var count = await query.CountAsync();
+
+                Expression<Func<Student, IComparable>> sortExpression = null;
+
+                switch (message.SortOn)
                 {
-                    case "name_desc":
-                        query = query.OrderByDescending(s => s.LastName);
+                    case SortOn.LastName:
+                        sortExpression = s => s.LastName;
                         break;
-                    case "Date":
-                        query = query.OrderBy(s => s.EnrollmentDate);
+                    case SortOn.FirstName:
+                        sortExpression = s => s.FirstName;
                         break;
-                    case "date_desc":
-                        query = query.OrderByDescending(s => s.EnrollmentDate);
+                    case SortOn.EnrollmentDate:
+                        sortExpression = s => s.EnrollmentDate;
                         break;
-                    default: // Name ascending 
-                        query = query.OrderBy(s => s.LastName);
+                    default:
+                        sortExpression = s => s.LastName;
                         break;
                 }
 
+                query = message.SortAscending ? query.OrderBy(sortExpression) : query.OrderByDescending(sortExpression);
+
                 var pageSize = 3;
                 var pageNumber = (message.Page ?? 1);
-                var count = await query.CountAsync();
                 var pageCount = (count + pageSize - 1) / pageSize;
 
                 query = query.Skip((pageNumber - 1)*pageSize).Take(pageSize);
