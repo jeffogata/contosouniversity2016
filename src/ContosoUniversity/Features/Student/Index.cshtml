@@ -6,12 +6,13 @@
 <h2>Students</h2>
 
 <p>
-    <a href="">Create New</a>
+    <a asp-action="Create">Create New</a>
 </p>
 <form method="GET">
     <p>
-        Find by name: 
-        <input type="submit" value="Search" />
+        Find by name: <input asp-for="SearchString"/>
+        <input type="hidden" id="Page" name="Page" value="1" />
+        <input type="submit" value="Search"/>
     </p>
 </form>
 <table class="table">
@@ -38,16 +39,50 @@
                 @item.FirstName
             </td>
             <td>
-                @item.EnrollmentDate
+                @item.EnrollmentDate?.ToString("d")
             </td>
             <td>
-                <a href="">Edit</a>
-                <a href="">Details</a>
-                <a href="">Delete</a>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
             </td>
         </tr>
     }
 
 </table>
-<br />
-    Page @(Model.Results.PageCount < Model.Results.PageNumber ? 0 : Model.Results.PageNumber) of @Model.Results.PageCount
+<br/>
+<hr/>
+@if (Model.Results.Any())
+{
+    <nav>
+        <ul class="pagination">
+            @if (Model.Page <= 1)
+            {
+                <li class="disabled"><a href="#">&laquo;</a></li>
+            }
+            else
+            {
+                <li><a asp-action="Index" asp-route-page="@(Model.Page - 1)" asp-route-searchstring="@Model.SearchString">&laquo;</a></li>
+            }
+            @for (var i = 0; i < Model.PageCount; i++)
+            {
+                if (Model.Page == (i + 1))
+                {
+                    <li class="active"><a asp-action="Index" asp-route-page="@(i + 1)" asp-route-searchstring="@Model.SearchString">@(i + 1)</a></li>
+                }
+                else
+                {
+                    <li ><a asp-action="Index" asp-route-page="@(i + 1)" asp-route-searchstring="@Model.SearchString">@(i + 1)</a></li>
+                }
+            }
+            @if (Model.Page >= Model.PageCount)
+            {
+                <li class="disabled"><a href="#">&raquo;</a></li>
+            }
+            else
+            {
+                <li><a asp-action="Index" asp-route-page="@(Model.Page + 1)" asp-route-searchstring="@Model.SearchString">&raquo;</a></li>
+            }
+        </ul>
+    </nav>
+}

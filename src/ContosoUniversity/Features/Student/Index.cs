@@ -10,7 +10,6 @@
     using Infrastructure;
     using MediatR;
     using Microsoft.Data.Entity;
-    using PagedList;
 
     public class Index
     {
@@ -29,11 +28,12 @@
             public string DateSortParm { get; set; }
             public string CurrentFilter { get; set; }
             public string SearchString { get; set; }
-            public IPagedList<Student> Results { get; set; }
-
+            public int Page { get; set; }
+            public int PageCount { get; set; }
+            public List<Student> Results { get; set; } 
             public class Student
             {
-                public int ID { get; set; }
+                public int Id { get; set; }
 
                 [Display(Name = "First Name")]
                 public string FirstName { get; set; }
@@ -51,60 +51,52 @@
 
             public override async Task<QueryResponse> Handle(Query message)
             {
-                var model = new QueryResponse
+                var response = new QueryResponse
                 {
                     CurrentSort = message.SortOrder,
                     NameSortParm = string.IsNullOrEmpty(message.SortOrder) ? "name_desc" : "",
-                    DateSortParm = message.SortOrder == "Date" ? "date_desc" : "Date"
+                    DateSortParm = message.SortOrder == "Date" ? "date_desc" : "Date",
+                    Page = message.Page ?? 1,
+                    SearchString = message.SearchString
                 };
 
-                if (message.SearchString != null)
+                var query = DbContext.Students.AsQueryable();
+
+                if (!string.IsNullOrWhiteSpace(message.SearchString))
                 {
-                    message.Page = 1;
-                }
-                else
-                {
-                    message.SearchString = message.CurrentFilter;
+                    query = query.Where(s => s.LastName.Contains(message.SearchString) 
+                                          || s.FirstName.Contains(message.SearchString));
                 }
 
-                model.CurrentFilter = message.SearchString;
-                model.SearchString = message.SearchString;
-
-                var students = from s in DbContext.Students
-                    select s;
-
-                if (!string.IsNullOrEmpty(message.SearchString))
-                {
-                    students = students.Where(s => s.LastName.Contains(message.SearchString)
-                                                   || s.FirstName.Contains(message.SearchString));
-                }
                 switch (message.SortOrder)
                 {
                     case "name_desc":
-                        students = students.OrderByDescending(s => s.LastName);
+                        query = query.OrderByDescending(s => s.LastName);
                         break;
                     case "Date":
-                        students = students.OrderBy(s => s.EnrollmentDate);
+                        query = query.OrderBy(s => s.EnrollmentDate);
                         break;
                     case "date_desc":
-                        students = students.OrderByDescending(s => s.EnrollmentDate);
+                        query = query.OrderByDescending(s => s.EnrollmentDate);
                         break;
                     default: // Name ascending 
-                        students = students.OrderBy(s => s.LastName);
+                        query = query.OrderBy(s => s.LastName);
                         break;
                 }
 
                 var pageSize = 3;
                 var pageNumber = (message.Page ?? 1);
+                var count = await query.CountAsync();
+                var pageCount = (count + pageSize - 1) / pageSize;
 
-                var source = await students.ToListAsync();
+                query = query.Skip((pageNumber - 1)*pageSize).Take(pageSize);
+
+                var students = await query.ToListAsync();
 
                 // problems using ProjectTo on Person/Student hierarchy
-                var mapped = Mapper.Map<List<QueryResponse.Student>>(source);
-
-                model.Results = mapped.AsQueryable().ToPagedList(pageNumber, pageSize);
-
-                return model;
+                response.Results = Mapper.Map<List<QueryResponse.Student>>(students);
+                response.PageCount = pageCount;
+                return response;
             }
         }
     }
