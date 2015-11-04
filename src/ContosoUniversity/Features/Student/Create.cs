@@ -40,10 +40,10 @@
 
             public override async Task<QueryResponse> Handle(Query message)
             {
-                return new QueryResponse
+                return await Task.Run(() => new QueryResponse
                 {
                     EnrollmentDate = DateTime.Now.Date
-                };
+                });
             }
         }
 

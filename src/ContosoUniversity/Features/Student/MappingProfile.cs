@@ -11,6 +11,7 @@
             CreateMap<Student, Details.QueryResponse>();
             CreateMap<Enrollment, Details.QueryResponse.StudentEnrollment>();
             CreateMap<Create.Command, Student>();
+            CreateMap<Student, Edit.QueryResponse>();
         }
     }
 }

@@ -28,7 +28,7 @@
             await Mediator.SendAsync(model);
             return RedirectToAction("Index");
         }
-/*
+
         public async Task<IActionResult> Edit(int id)
         {
             return View(await Mediator.SendAsync(new Edit.Query(id)));
@@ -52,6 +52,5 @@
             await Mediator.SendAsync(model);
             return RedirectToAction("Index");
         }
-        */
     }
 }
