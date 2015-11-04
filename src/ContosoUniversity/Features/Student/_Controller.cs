@@ -12,12 +12,11 @@
             return View(await Mediator.SendAsync(query));
         }
 
-        /*
         public async Task<IActionResult> Details(int id)
         {
             return View(await Mediator.SendAsync(new Details.Query(id)));
         }
-
+/*
         public async Task<IActionResult> Create()
         {
             return View(await Mediator.SendAsync(new Create.Query()));
