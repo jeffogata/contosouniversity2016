@@ -1,5 +1,7 @@
-﻿@using Microsoft.Data.Entity.Metadata
+﻿@using System.Threading.Tasks
+@using Microsoft.Data.Entity.Metadata
 @using Microsoft.Framework.DependencyInjection
+@using SortOn = ContosoUniversity.Features.Student.Index.SortOn
 @model ContosoUniversity.Features.Student.Index.QueryResponse
 @{
     ViewBag.Title = "Students";
@@ -20,13 +22,13 @@
 <table class="table">
     <tr>
         <th>
-            <a asp-route-searchstring="@Model.SearchString" asp-route-sorton="@ContosoUniversity.Features.Student.Index.SortOn.LastName" asp-route-sortascending="@true">Last Name</a>
+            <a asp-route-searchstring="@Model.SearchString" asp-route-sorton="@SortOn.LastName" asp-route-sortascending="@(Model.CurrentSort != SortOn.LastName || !Model.SortAscending)">Last Name</a>
         </th>
         <th>
-            <a asp-route-searchstring="@Model.SearchString" asp-route-sorton="@ContosoUniversity.Features.Student.Index.SortOn.FirstName" asp-route-sortascending="@true">First Name</a>
+            <a asp-route-searchstring="@Model.SearchString" asp-route-sorton="@SortOn.FirstName" asp-route-sortascending="@(Model.CurrentSort != SortOn.FirstName || !Model.SortAscending)">First Name</a>
         </th>
         <th>
-            <a asp-route-searchstring="@Model.SearchString" asp-route-sorton="@ContosoUniversity.Features.Student.Index.SortOn.EnrollmentDate" asp-route-sortascending="@true">Enrollment Date</a>
+            <a asp-route-searchstring="@Model.SearchString" asp-route-sorton="@SortOn.EnrollmentDate" asp-route-sortascending="@(Model.CurrentSort != SortOn.EnrollmentDate || !Model.SortAscending)">Enrollment Date</a>
         </th>
         <th></th>
     </tr>

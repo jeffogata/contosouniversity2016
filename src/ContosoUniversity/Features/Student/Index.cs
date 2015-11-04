@@ -25,8 +25,8 @@
 
         public class Query : IAsyncRequest<QueryResponse>
         {
-            public SortOn SortOn { get; set; }
-            public bool SortAscending { get; set; }
+            public SortOn? SortOn { get; set; }
+            public bool? SortAscending { get; set; }
             public string SearchString { get; set; }
             public int? Page { get; set; }
         }
@@ -64,8 +64,8 @@
             {
                 var response = new QueryResponse
                 {
-                    CurrentSort = message.SortOn,
-                    SortAscending = message.SortAscending,
+                    CurrentSort = message.SortOn ?? SortOn.LastName,
+                    SortAscending = message.SortAscending ?? true,
                     SearchString = message.SearchString,
                     Page = message.Page ?? 1,
                 };
@@ -99,7 +99,7 @@
                         break;
                 }
 
-                query = message.SortAscending ? query.OrderBy(sortExpression) : query.OrderByDescending(sortExpression);
+                query = response.SortAscending ? query.OrderBy(sortExpression) : query.OrderByDescending(sortExpression);
 
                 var pageSize = 3;
                 var pageNumber = (message.Page ?? 1);
