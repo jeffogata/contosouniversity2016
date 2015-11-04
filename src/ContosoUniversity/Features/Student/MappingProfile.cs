@@ -10,6 +10,7 @@
             CreateMap<Student, Index.QueryResponse.Student>();
             CreateMap<Student, Details.QueryResponse>();
             CreateMap<Enrollment, Details.QueryResponse.StudentEnrollment>();
+            CreateMap<Create.Command, Student>();
         }
     }
 }
