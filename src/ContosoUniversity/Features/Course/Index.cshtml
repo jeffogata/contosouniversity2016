@@ -11,15 +11,8 @@
 
 <form class="form-horizontal" role="form">
     <p>
-        <div class="container">
-            <div class="col-lg-6">
-                <div class="input-group">
-                    <span class="input-group-addon">Department</span>
-                    <select asp-for="DepartmentId" asp-items="Model.Departments" class="form-control"></select>
-                    <button type="submit" class="btn-default btn">Filter</button>
-                </div>
-            </div>
-        </div>
+        Select Department: <select asp-for="DepartmentId" asp-items="Model.Departments"></select>
+        <input type="submit" value="Filter" />
     </p>
 </form>
 

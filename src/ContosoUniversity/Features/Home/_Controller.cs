@@ -1,19 +1,19 @@
 ﻿namespace ContosoUniversity.Features.Home
 {
+    using System.Threading.Tasks;
+    using Infrastructure;
     using Microsoft.AspNet.Mvc;
 
-    public class _Controller : Controller
+    public class _Controller : MediatorController
     {
         public IActionResult Index()
         {
             return View();
         }
 
-        public IActionResult About()
+        public async Task<IActionResult> About()
         {
-            ViewData["Message"] = "CU 2016 application description page.";
-
-            return View();
+            return View(await Mediator.SendAsync(new About.Query()));
         }
 
         public ActionResult Contact()
