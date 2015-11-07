@@ -12,9 +12,9 @@ file that is almost entirely C# code
 
 }
 
-
 #default description="First target, which is called when no targets are provided"
   @{
+    Console.WriteLine("foobar");
     Log.Info("No target specified - calling 'test'");
     CallTarget("test");
 
@@ -69,3 +69,18 @@ file that is almost entirely C# code
         Log.Info(string.Format("{0} - {1}", target.Name, target.Description));
     }
   }
+
+#help description="Help for this build"
+@{
+  var helpText = @"
+
+  ******************************** HELP ********************************
+  ";
+
+  foreach(var target in Targets.Values)
+  {
+      helpText += string.Format("{0} - {1}{2}", target.Name, target.Description, Environment.NewLine);
+  }
+
+  Log.Info(helpText);
+}
