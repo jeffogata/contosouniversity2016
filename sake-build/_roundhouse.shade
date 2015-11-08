@@ -1,0 +1,55 @@
+		
+@{/*
+
+roundhouse
+	Executes rh to rebuild or upgrade your database.
+
+connectionString=''
+	Required.  The connection string to the database.
+
+environment=''
+	Roundhouse will only run scripts for the specified environment.
+
+silent='true'
+	Instructs roundhouse to not ask for input when it runs.
+
+roundhouseDir='TOOLS_DIR/roundhouse'
+	Path to the roundhouse executable.
+
+outputDir='TOOLS_DIR/roundhouse/output'
+	Path to the roundhouse output directory.
+
+sqlFilesDir='SOURCE_DIR/DatabaseMigration'
+	Path to the location of your SQL scripts.
+
+options=''
+	Additional configuration options to pass to roundhouse.	
+*/}
+
+default environment = ''
+default silent = 'true'
+default roundhouseDir = '${Path.Combine(TOOLS_DIR, "roundhouse")}'
+default outputDir = '${Path.Combine(roundhouseDir, "output")}'
+default sqlFilesDir = '${Path.Combine(SOURCE_DIR, "DatabaseMigration")}'
+default options = ''
+
+var roundhouseExe = '${Path.Combine(roundhouseDir, "rh")}'
+
+@{
+	if (!string.IsNullOrWhiteSpace(environment))
+	{
+		options = options + ' --env=' + environment;
+	}
+
+	if (silent.Equals('true', StringComparison.OrdinalIgnoreCase))
+	{
+		options = options + ' --silent';
+	}
+
+	options = options + ' --connstring=' + connectionString;
+	options = options + ' --output=' + outputDir;
+	options = options + ' --files=' + sqlFilesDir;
+}
+
+exec program='${roundhouseExe}' commandline='${options}' workingdir='${roundhouseDir}'
+

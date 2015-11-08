@@ -3,7 +3,38 @@ use namespace="System.IO"
 use import="Console"
 use import="Help"
 
-#default description="Comprehensive Building|(default)|Intended for first build or when you want a fresh, clean local copy"
+functions
+	@{
+		static string PROJECT_NAME = "ContosoUniversity2016";
+		static string TEST_PROJECT_NAME = "ContosoUniversity.Tests";
+
+		static string BASE_DIR = Directory.GetCurrentDirectory();
+		static string BUILD_DIR = Path.Combine(BASE_DIR, "build");
+		static string SOURCE_DIR = Path.Combine(BASE_DIR, "src");
+		static string TEST_DIR = Path.Combine(BUILD_DIR, "test");
+
+		static string TOOLS_DIR = Path.Combine(BASE_DIR, "tools");
+		static string DB_SCRIPTS_DIR = Path.Combine(SOURCE_DIR, "DatabaseMigration");
+		static string DB_UP_DIR = Path.Combine(DB_SCRIPTS_DIR, "up");
+		static string ROUNDHOUSE_DIR = Path.Combine(BASE_DIR, "tools", "roundhouse");
+		static string ROUNDHOUSE_OUTPUT_DIR = Path.Combine(ROUNDHOUSE_DIR, "output");
+		static string ROUNDHOUSE_EXE_PATH = Path.Combine(ROUNDHOUSE_DIR, "rh.exe");
+
+		static string DEV_CONNECTION_STRING_NAME = string.Join(".", PROJECT_NAME, "ConnectionString");
+		static string TEST_CONNECTION_STRING_NAME = string.Join(".", TEST_PROJECT_NAME, "ConnectionString");
+
+		//static string DB_SERVER = Environment.GetEnvironmentVariable("db_server") ?? "localhost";
+		//static string DB_NAME = Environment.GetEnvironmentVariable("db_name") ?? "ContosoUniversity2016";
+		//static string TEST_DB_NAME = Environment.GetEnvironmentVariable("test_db_name") ?? "ContosoUniversity2016.Tests";
+
+		static string DEV_CONNECTION_STRING = Environment.GetEnvironmentVariable(DEV_CONNECTION_STRING_NAME) ?? 
+												"Server=localhost;Database=ContosoUniversity2016;Trusted_Connection=True;MultipleActiveResultSets=true";
+
+		static string TEST_CONNECTION_STRING = Environment.GetEnvironmentVariable(TEST_CONNECTION_STRING_NAME) ?? 
+												"Server=localhost;Database=ContosoUniversity2016.Tests;Trusted_Connection=True;MultipleActiveResultSets=true";
+	}
+
+#default description="(default)|Comprehensive Building|Intended for first build or when you want a fresh, clean local copy"
 	@{
 		Log.Info("default build");
 	}
@@ -15,12 +46,21 @@ use import="Help"
 
 #udb description="Database Maintenance|Update the Database to the latest version (leave db up to date with migration scripts)"
 	@{
-		Log.Info("udb build");
+		WriteLine("Executing udb", ConsoleColor.Cyan);
+
+		Roundhouse(DEV_CONNECTION_STRING, "DEV", "--transaction");
+		Roundhouse(TEST_CONNECTION_STRING, "TEST", "--transaction");
 	}
 
 #rdb description="Database Maintenance|Rebuild database to the latest version from scratch (useful while working on the schema)"
 	@{
-		Log.Info("rdb build");
+		WriteLine("Executing rdb", ConsoleColor.Cyan);
+
+		Roundhouse(DEV_CONNECTION_STRING, "DEV", "--drop");
+		Roundhouse(DEV_CONNECTION_STRING, "DEV", "--transaction");
+
+		Roundhouse(TEST_CONNECTION_STRING, "TEST", "--drop");
+		Roundhouse(TEST_CONNECTION_STRING, "TEST", "--transaction");
 	}
 
 #rat description="Running Tests|Run all tests"
@@ -32,7 +72,13 @@ use import="Help"
 	@{
 		WriteLine("Executing help", ConsoleColor.Cyan);
 		WriteHelp();
-	}
+	}	
+
+macro name='Roundhouse' connectionString='string' environment='string' options='string'
+   roundhouse
+
+macro name='Exec' program='string' commandline='string' workingdir='string'
+   exec
 
 @{
 	// global actions here - will always be performed before first task

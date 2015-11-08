@@ -218,6 +218,9 @@ _Pvt_Extensions
 # RoundhouseE Migration Files
 *.GITIGNORE.*
 
+# RoundhousE Output Files
+**/roundhouse/output
+
 # VS Code
 Code
 

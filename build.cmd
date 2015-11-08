@@ -20,8 +20,8 @@ IF EXIST packages\Sake goto getdnx
 .nuget\NuGet.exe install Sake -ExcludeVersion -Source https://www.nuget.org/api/v2/ -Out packages
 
 :getdnx
-echo Installing DNX - 1.0.0-beta8 clr x86
-CALL dnvm install 1.0.0-beta8 -runtime CLR -arch x86 -alias default
+rem echo Installing DNX - 1.0.0-beta8 clr x86
+rem CALL dnvm install 1.0.0-beta8 -runtime CLR -arch x86 -alias default
 
 :run
 echo Building... %1
