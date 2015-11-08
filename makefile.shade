@@ -2,46 +2,72 @@ use namespace="System"
 use namespace="System.IO"
 use import="Console"
 use import="Help"
+use import="MsBuild"
 
 functions
 	@{
 		static string PROJECT_NAME = "ContosoUniversity2016";
-		static string TEST_PROJECT_NAME = "ContosoUniversity.Tests";
+		static string TEST_PROJECT_NAME = PROJECT_NAME + ".Tests";
 
 		static string BASE_DIR = Directory.GetCurrentDirectory();
 		static string BUILD_DIR = Path.Combine(BASE_DIR, "build");
 		static string SOURCE_DIR = Path.Combine(BASE_DIR, "src");
 		static string TEST_DIR = Path.Combine(BUILD_DIR, "test");
-
 		static string TOOLS_DIR = Path.Combine(BASE_DIR, "tools");
-		static string DB_SCRIPTS_DIR = Path.Combine(SOURCE_DIR, "DatabaseMigration");
-		static string DB_UP_DIR = Path.Combine(DB_SCRIPTS_DIR, "up");
-		static string ROUNDHOUSE_DIR = Path.Combine(BASE_DIR, "tools", "roundhouse");
-		static string ROUNDHOUSE_OUTPUT_DIR = Path.Combine(ROUNDHOUSE_DIR, "output");
-		static string ROUNDHOUSE_EXE_PATH = Path.Combine(ROUNDHOUSE_DIR, "rh.exe");
+
+		static string CONFIGURATION = "Release";
+		
+		static string PROJECT_FILE = Path.Combine(SOURCE_DIR, PROJECT_NAME + ".sln");
 
 		static string DEV_CONNECTION_STRING_NAME = string.Join(".", PROJECT_NAME, "ConnectionString");
 		static string TEST_CONNECTION_STRING_NAME = string.Join(".", TEST_PROJECT_NAME, "ConnectionString");
-
-		//static string DB_SERVER = Environment.GetEnvironmentVariable("db_server") ?? "localhost";
-		//static string DB_NAME = Environment.GetEnvironmentVariable("db_name") ?? "ContosoUniversity2016";
-		//static string TEST_DB_NAME = Environment.GetEnvironmentVariable("test_db_name") ?? "ContosoUniversity2016.Tests";
-
 		static string DEV_CONNECTION_STRING = Environment.GetEnvironmentVariable(DEV_CONNECTION_STRING_NAME) ?? 
 												"Server=localhost;Database=ContosoUniversity2016;Trusted_Connection=True;MultipleActiveResultSets=true";
-
 		static string TEST_CONNECTION_STRING = Environment.GetEnvironmentVariable(TEST_CONNECTION_STRING_NAME) ?? 
 												"Server=localhost;Database=ContosoUniversity2016.Tests;Trusted_Connection=True;MultipleActiveResultSets=true";
 	}
 
-#default description="(default)|Comprehensive Building|Intended for first build or when you want a fresh, clean local copy"
+#default .clean .restore .build .rdb description="(default)|Comprehensive Building|Intended for first build or when you want a fresh, clean local copy"
 	@{
-		Log.Info("default build");
+		// run tests
 	}
 
-#dev description="Comprehensive Building|Optimized for local dev; Most noteably UPDATES databases instead of REBUILDING"
+#dev .clean .restore .build .udb description="Comprehensive Building|Optimized for local dev; Most noteably UPDATES databases instead of REBUILDING"
 	@{
-		Log.Info("dev build");
+		// run tests
+	}
+
+#clean description="Building|Remove artifacts of a previous build"
+	@{
+		WriteLine("Executing clean", ConsoleColor.Cyan);
+
+		// clear the artifacts folder from prior builds or this one may fail when doing a 'dnu restore'
+		var artifactsDir = Path.Combine(SOURCE_DIR, "artifacts");
+
+		if (Directory.Exists(artifactsDir))
+		{
+			Directory.Delete(artifactsDir, true);
+		}
+
+		var extra = "/t:clean /v:q";
+
+		ExecuteMsBuild(PROJECT_FILE, CONFIGURATION, extra);
+	}
+
+#restore description="Building|Restore packages for the project"
+	@{
+		WriteLine("Executing restore", ConsoleColor.Cyan);
+
+		Exec("cmd", "/C dnu restore");
+	}
+
+#build description="Building|Build the project"
+	@{
+		WriteLine("Executing build", ConsoleColor.Cyan);
+
+		var extra = "/t:build /v:q";
+
+		ExecuteMsBuild(PROJECT_FILE, CONFIGURATION, extra);
 	}
 
 #udb description="Database Maintenance|Update the Database to the latest version (leave db up to date with migration scripts)"
@@ -76,9 +102,6 @@ functions
 
 macro name='Roundhouse' connectionString='string' environment='string' options='string'
    roundhouse
-
-macro name='Exec' program='string' commandline='string' workingdir='string'
-   exec
 
 @{
 	// global actions here - will always be performed before first task

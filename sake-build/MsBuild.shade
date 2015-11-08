@@ -1,0 +1,36 @@
+use namespace="System.IO"
+
+functions
+	@{
+		public void ExecuteMsBuild(string projectPath, string configuration, string extra)
+		{
+			// The Sake _build.shade partial does not locate the correct version of MSBuild (it was finding v4.6.79.0)
+			// Copied this code from the _k-standard-goals.shade partial of the aspnet Universe project:
+			// https://github.com/aspnet/Universe/blob/d679c85aa386f00afde6ce7062f286dedb76c7f9/build/_k-standard-goals.shade#L154
+			
+			var programFilesX86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
+			var msbuildVersions = new[] { "14.0", "12.0"};
+			var msBuildFound = false;
+
+			for (var i = 0; i < msbuildVersions.Length; i++)
+			{
+				var msbuildPath =  Path.Combine(programFilesX86, "MSBuild", msbuildVersions[i], "Bin", "MSBuild.exe");
+				if (File.Exists(msbuildPath))
+				{
+					msBuildFound = true;
+		    		Exec(msbuildPath, projectPath + " /p:Configuration=" + configuration + " " + extra);
+			  	}
+
+			  	break;
+			}
+
+			if (!msBuildFound)
+			{
+				Log.Warn("msbuild version 14 or 12 not found. Please ensure you have the VS 2015 or VS 2013 C++ SDK installed.");
+				Environment.Exit(1);
+			}
+		}
+	}
+
+macro name='Exec' program='string' commandline='string'
+   exec	
