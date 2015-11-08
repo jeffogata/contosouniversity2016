@@ -37,10 +37,10 @@ functions
 			{
 				var target = kvp.Value;
 
-				// specifying the char '|' this way because (apparently in Spark) strings can be delimited by single quotes 
-				// so '|' is treated as a string.  '|'[0] would also work here, but I felt "|" was more correct.
+				// have to cast to char since strings can be delimited by single quotes 
+				// (without the cast, the compiler complains that there is no overload that takes a string)
 
-				var tokens = target.Description.Split("|"[0]); 
+				var tokens = target.Description.Split((char)'|'); 
 
 				switch(tokens.Length)
 				{
