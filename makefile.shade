@@ -7,34 +7,32 @@ use import="MsBuild"
 functions
 	@{
 		static string PROJECT_NAME = "ContosoUniversity2016";
-		static string TEST_PROJECT_NAME = PROJECT_NAME + ".Tests";
 
 		static string BASE_DIR = Directory.GetCurrentDirectory();
-		static string BUILD_DIR = Path.Combine(BASE_DIR, "build");
 		static string SOURCE_DIR = Path.Combine(BASE_DIR, "src");
-		static string TEST_DIR = Path.Combine(BUILD_DIR, "test");
 		static string TOOLS_DIR = Path.Combine(BASE_DIR, "tools");
+		
+		static string TEST_PROJECT_NAME = "ContosoUniversity.Tests";
+		static string TEST_PROJECT_DIR = Path.Combine(SOURCE_DIR, TEST_PROJECT_NAME);
 
 		static string CONFIGURATION = "Release";
 		
 		static string PROJECT_FILE = Path.Combine(SOURCE_DIR, PROJECT_NAME + ".sln");
 
 		static string DEV_CONNECTION_STRING_NAME = string.Join(".", PROJECT_NAME, "ConnectionString");
-		static string TEST_CONNECTION_STRING_NAME = string.Join(".", TEST_PROJECT_NAME, "ConnectionString");
+		static string TEST_CONNECTION_STRING_NAME = string.Join(".", PROJECT_NAME + ".Tests", "ConnectionString");
 		static string DEV_CONNECTION_STRING = Environment.GetEnvironmentVariable(DEV_CONNECTION_STRING_NAME) ?? 
 												"Server=localhost;Database=ContosoUniversity2016;Trusted_Connection=True;MultipleActiveResultSets=true";
 		static string TEST_CONNECTION_STRING = Environment.GetEnvironmentVariable(TEST_CONNECTION_STRING_NAME) ?? 
 												"Server=localhost;Database=ContosoUniversity2016.Tests;Trusted_Connection=True;MultipleActiveResultSets=true";
 	}
 
-#default .clean .restore .build .rdb description="(default)|Comprehensive Building|Intended for first build or when you want a fresh, clean local copy"
+#default .clean .restore .build .rdb .rat description="(default)|Comprehensive Building|Intended for first build or when you want a fresh, clean local copy"
 	@{
-		// run tests
 	}
 
-#dev .clean .restore .build .udb description="Comprehensive Building|Optimized for local dev; Most noteably UPDATES databases instead of REBUILDING"
+#dev .clean .restore .build .udb .rat description="Comprehensive Building|Optimized for local dev; Most noteably UPDATES databases instead of REBUILDING"
 	@{
-		// run tests
 	}
 
 #clean description="Building|Remove artifacts of a previous build"
@@ -57,7 +55,6 @@ functions
 #restore description="Building|Restore packages for the project"
 	@{
 		WriteLine("Executing restore", ConsoleColor.Cyan);
-
 		Exec("cmd", "/C dnu restore");
 	}
 
@@ -91,7 +88,11 @@ functions
 
 #rat description="Running Tests|Run all tests"
 	@{
-		Log.Info("rdb build");
+		WriteLine("Executing rat", ConsoleColor.Cyan);
+
+		var commandline = string.Format("/C dnx -p {0} test", TEST_PROJECT_DIR);
+
+		Exec("cmd", commandline);
 	}
 
 #help description="Help|Displays a list of build commands"
