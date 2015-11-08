@@ -1,86 +1,41 @@
 use namespace="System"
 use namespace="System.IO"
+use import="Console"
+use import="Help"
+
+#default description="Comprehensive Building|(default)|Intended for first build or when you want a fresh, clean local copy"
+	@{
+		Log.Info("default build");
+	}
+
+#dev description="Comprehensive Building|Optimized for local dev; Most noteably UPDATES databases instead of REBUILDING"
+	@{
+		Log.Info("dev build");
+	}
+
+#udb description="Database Maintenance|Update the Database to the latest version (leave db up to date with migration scripts)"
+	@{
+		Log.Info("udb build");
+	}
+
+#rdb description="Database Maintenance|Rebuild database to the latest version from scratch (useful while working on the schema)"
+	@{
+		Log.Info("rdb build");
+	}
+
+#rat description="Running Tests|Run all tests"
+	@{
+		Log.Info("rdb build");
+	}
+
+#help description="Help|Displays a list of build commands"
+	@{
+		WriteLine("Executing help", ConsoleColor.Cyan);
+		WriteHelp();
+	}
 
 @{
-    var baseDir = Directory.GetCurrentDirectory();
-    var targetDir = Path.Combine(baseDir, "target");
-
-    var aboutText = @"
-This example is mostly showing how you can create a build
-file that is almost entirely C# code
-";
-
-}
-
-#default description="First target, which is called when no targets are provided"
-  @{
-    Console.WriteLine("foobar");
-    Log.Info("No target specified - calling 'test'");
-    CallTarget("test");
-
-    Log.Info("For more information, run `sake about`");
-  }
-
-
-#clean description="Wipe out the ./target subfolder"
-  @{
-    Log.Info("cleaning");
-    if (Directory.Exists(targetDir))
-    {
-        Log.Info("Deleting - " + targetDir);
-        Directory.Delete(targetDir, true);
-    }
-  }
-
-
-#build .clean description="Add some files to the ./target subfolder"
-  @{
-    Log.Info("building");
-    if (!Directory.Exists(targetDir))
-    {
-        Directory.CreateDirectory(targetDir);
-    }
-    for (var index = 0; index != 10; ++index)
-    {
-        var fileName = Path.Combine(targetDir, "file_" + index + ".txt");
-        Log.Info("Writing - " + fileName);
-        File.WriteAllText(fileName, "This is file " + index);
-    }
-  }
-
-
-#test .build description="Test that files exist in ./target subfolder :)"
-  @{
-    Log.Info("testing");
-    var files = Directory.GetFiles(targetDir);
-    if (files.Length != 10)
-    {
-        throw new Exception("Expected 10 files");
-    }
-  }
-
-
-#about description="Provides info about this sample"
-  @{
-    Log.Info(aboutText);
-    Log.Info("It has the following targets:");
-    foreach(var target in Targets.Values)
-    {
-        Log.Info(string.Format("{0} - {1}", target.Name, target.Description));
-    }
-  }
-
-#help description="Help for this build"
-@{
-  var helpText = @"
-
-  ******************************** HELP ********************************
-  ";
-
-  foreach(var target in Targets.Values)
-  {
-      helpText += string.Format("{0} - {1}{2}", target.Name, target.Description, Environment.NewLine);
-  }
-
-  Log.Info(helpText);
+	// global actions here - will always be performed before first task
+	// unfortunately, we can't get the arguments that were used in the call
+	// to check and fail gracefully if the target does not exist
 }

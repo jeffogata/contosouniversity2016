@@ -1,0 +1,41 @@
+
+use namespace="System"
+use namespace="System.IO"
+
+functions
+  @{
+    void WriteLine()
+    {
+      Console.WriteLine();
+    }
+
+    void WriteLine(string text, ConsoleColor? color = null)
+    {
+      if (color != null)
+      {
+        Console.ForegroundColor = color.Value;
+      }
+
+      Console.WriteLine(text);
+
+      if (color != null)
+      {
+        Console.ResetColor();
+      }
+    }
+
+    void Write(string text, ConsoleColor? color = null)
+    {
+      if (color != null)
+      {
+        Console.ForegroundColor = color.Value;
+      }
+
+      Console.Write(text);
+
+      if (color != null)
+      {
+        Console.ResetColor();
+      }
+    }
+  }

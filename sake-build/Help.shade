@@ -1,0 +1,160 @@
+
+use namespace="System"
+use namespace="System.IO"
+use namespace="System.Collections"
+use namespace="System.Collections.Generic"
+use import="Console"
+
+functions
+	@{
+		void WriteHelp()
+		{
+			WriteHelpHeader();
+
+			var groups = GetTargetGroups();
+
+			WriteHelpGroups(groups);
+			WriteHelpFooter();
+		}
+
+		void WriteHelpHeader()
+		{
+			WriteLine();
+			Write("********************************", ConsoleColor.DarkGreen);
+			Write(" HELP ", ConsoleColor.Green);
+			WriteLine("********************************", ConsoleColor.DarkGreen);
+			WriteLine();
+			Write("This build script has the following common build ");
+			Write("task", ConsoleColor.Green);
+			WriteLine(" aliases set up:");
+		}
+
+		TargetGroups GetTargetGroups()
+		{
+			var groups = new TargetGroups();
+
+			foreach(var kvp in Targets)
+			{
+				var target = kvp.Value;
+
+				// specifying the char '|' this way because (apparently in Spark) strings can be delimited by single quotes 
+				// so '|' is treated as a string.  '|'[0] would also work here, but I felt "|" was more correct.
+
+				var tokens = target.Description.Split("|"[0]); 
+
+				switch(tokens.Length)
+				{
+					case 3:
+						groups.Add(tokens[0], tokens[1], tokens[2]);
+						break;
+					case 2:
+						groups.Add(tokens[0], target.Name, tokens[1]);
+						break;
+					default:
+						groups.Add("Ungrouped", target.Name, target.Description);
+						break;
+				}
+			}
+
+			return groups;
+		}
+
+		void WriteHelpGroups(TargetGroups groups)
+		{
+			foreach(var group in groups)
+			{
+				WriteLine();
+				Write(" ");
+				WriteLine(group.Name, ConsoleColor.DarkGreen);
+
+				foreach(var target in group.Targets)
+				{
+					Write("  > ");
+					Write(target.Name, ConsoleColor.Green);
+					Write(" = ");
+					WriteLine(target.Description);
+				}
+			}
+		}
+
+		void WriteHelpFooter()
+		{
+			WriteLine();
+			WriteLine(" For a complete list of build tasks, view makefile.shade.");
+			WriteLine();
+			WriteLine("**********************************************************************", ConsoleColor.DarkGreen);
+		}
+
+		public class TargetItem
+		{
+			public TargetItem(string name, string description)
+			{
+				Name = name;
+				Description = description;
+			}
+			
+			public string Name { get; private set; }
+
+			public string Description { get; private set; }
+		}
+
+		public class TargetGroup
+		{
+			private readonly List<TargetItem> _targets;
+
+			public TargetGroup(string name) 
+			{
+				_targets = new List<TargetItem>();
+				Name = name;
+			}
+
+			public string Name { get; private set; }
+
+			public List<TargetItem> Targets { get { return _targets; } }
+
+			public TargetItem Add(string name, string description)
+			{
+				var item = new TargetItem(name, description);
+				_targets.Add(item);
+				return item;
+			}
+		}
+
+		public class TargetGroups : IEnumerable<TargetGroup>
+		{
+			private readonly Dictionary<string, TargetGroup> _groups;
+
+			public TargetGroups()
+			{
+				_groups = new Dictionary<string, TargetGroup>();				
+			}
+
+			public TargetGroup Add(string groupName, string itemName, string itemDescription)
+			{
+				var group = _groups.ContainsKey(groupName) ? _groups[groupName] : null;
+				
+				if (group == null)
+				{
+					group = new TargetGroup(groupName);
+					_groups.Add(group.Name, group);
+				}
+				
+				group.Add(itemName, itemDescription);
+				
+				return group;
+			}
+			
+			System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+			{
+				return this.GetEnumerator();
+			}
+			
+			public IEnumerator<TargetGroup> GetEnumerator()
+			{
+				foreach(var kvp in _groups)
+				{
+					yield return kvp.Value;
+				}
+			}
+		}
+	}

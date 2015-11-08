@@ -1,11 +1,7 @@
 @echo off
-
-rem %~dp0 expands into the directory of the current file
 cd %~dp0
 
-rem SETLOCAL sets context of changes to environment values to be local to this script
 SETLOCAL
-	
 SET NUGET_VERSION=latest
 SET CACHED_NUGET=%LocalAppData%\NuGet\nuget.%NUGET_VERSION%.exe
 
@@ -24,9 +20,9 @@ IF EXIST packages\Sake goto getdnx
 .nuget\NuGet.exe install Sake -ExcludeVersion -Source https://www.nuget.org/api/v2/ -Out packages
 
 :getdnx
-rem echo Installing DNX - 1.0.0-beta8 clr x86
-rem CALL dnvm install 1.0.0-beta8 -runtime CLR -arch x86 -alias default
+echo Installing DNX - 1.0.0-beta8 clr x86
+CALL dnvm install 1.0.0-beta8 -runtime CLR -arch x86 -alias default
 
-:build
-echo Build... %1
-packages\Sake\tools\Sake.exe -f makefile.shade %1
+:run
+echo Building... %1
+packages\Sake\tools\Sake.exe -I sake-build -f makefile.shade %1
