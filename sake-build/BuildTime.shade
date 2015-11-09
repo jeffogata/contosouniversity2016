@@ -1,0 +1,82 @@
+use namespace="System"
+use namespace="System.Collections"
+use namespace="System.Collections.Generic"
+use namespace="System.Linq"
+use import="Console"
+
+functions
+	@{
+		Dictionary<string, TimeEntry> timeEntries = new Dictionary<string, TimeEntry>();
+
+		public void StartTarget(string name)
+		{
+			WriteLine("");
+			WriteLine("Executing " + name, ConsoleColor.Cyan);
+			timeEntries.Add(name, new TimeEntry(name, DateTime.Now));
+		}
+
+		public void FinishTarget(string name)
+		{
+			var entry = timeEntries[name];
+			entry.CompleteEntry();
+			WriteLine(string.Format("Completed {0} in {1}", name, entry.Duration), ConsoleColor.Yellow);
+		}
+
+		public void ReportTime()
+		{
+			WriteLine("----------------------------------------------------------------------");
+			WriteLine("Build Time Report");
+			WriteLine("----------------------------------------------------------------------");
+
+			var maxNameLength = timeEntries.Keys.Max(k => k.Length) + 1;
+
+			if (maxNameLength < 6)
+			{
+				maxNameLength = 6;	// Total:
+			};
+
+			var format = "{0,-" + maxNameLength.ToString() + "}{1}";
+
+			WriteLine(string.Format(format, "Name", "Duration"));
+			WriteLine(string.Format(format, "----", "--------"));
+
+			var totalDuration = TimeSpan.Zero;
+
+			foreach(var kvp in timeEntries)
+			{
+				WriteLine(string.Format(format, kvp.Key, kvp.Value.Duration));
+				totalDuration += kvp.Value.Duration;
+			}
+
+			WriteLine(string.Format(format, "Total:", totalDuration));
+			WriteLine("");
+		}
+
+		public class TimeEntry
+		{
+			public TimeEntry(string name, DateTime startTime)
+			{
+				Name = name;
+				StartTime = startTime;
+			}
+
+			public void CompleteEntry()
+			{
+				EndTime = DateTime.Now;
+			}
+			
+			public string Name { get; private set; }
+
+			public DateTime StartTime { get; private set; }
+
+			public DateTime? EndTime { get; private set; }
+			
+			public TimeSpan Duration 
+			{
+				get
+				{
+					return EndTime.HasValue ? EndTime.Value - StartTime : TimeSpan.Zero;
+				}
+			}
+		}
+	}

@@ -3,6 +3,7 @@ use namespace="System.IO"
 use import="Console"
 use import="Help"
 use import="MsBuild"
+use import="BuildTime"
 
 functions
 	@{
@@ -29,15 +30,17 @@ functions
 
 #default .clean .restore .build .rdb .rat description="(default)|Comprehensive Building|Intended for first build or when you want a fresh, clean local copy"
 	@{
+		ReportTime();
 	}
 
 #dev .clean .restore .build .udb .rat description="Comprehensive Building|Optimized for local dev; Most noteably UPDATES databases instead of REBUILDING"
 	@{
+		ReportTime();
 	}
 
 #clean description="Building|Remove artifacts of a previous build"
 	@{
-		WriteLine("Executing clean", ConsoleColor.Cyan);
+		StartTarget("Clean");
 
 		// clear the artifacts folder from prior builds or this one may fail when doing a 'dnu restore'
 		var artifactsDir = Path.Combine(SOURCE_DIR, "artifacts");
@@ -50,54 +53,64 @@ functions
 		var extra = "/t:clean /v:q";
 
 		ExecuteMsBuild(PROJECT_FILE, CONFIGURATION, extra);
+
+		FinishTarget("Clean");
 	}
 
 #restore description="Building|Restore packages for the project"
 	@{
-		WriteLine("Executing restore", ConsoleColor.Cyan);
+		StartTarget("Restore");
 		Exec("cmd", "/C dnu restore");
+		FinishTarget("Restore");
 	}
 
-#build description="Building|Build the project"
+#build .clean .restore description="Building|Build the project"
 	@{
-		WriteLine("Executing build", ConsoleColor.Cyan);
+		StartTarget("Build");
 
 		var extra = "/t:build /v:q";
 
 		ExecuteMsBuild(PROJECT_FILE, CONFIGURATION, extra);
+
+		FinishTarget("Build");
 	}
 
 #udb description="Database Maintenance|Update the Database to the latest version (leave db up to date with migration scripts)"
 	@{
-		WriteLine("Executing udb", ConsoleColor.Cyan);
+		StartTarget("Update Databases");
 
 		Roundhouse(DEV_CONNECTION_STRING, "DEV", "--transaction");
 		Roundhouse(TEST_CONNECTION_STRING, "TEST", "--transaction");
+
+		FinishTarget("Update Databases");
 	}
 
 #rdb description="Database Maintenance|Rebuild database to the latest version from scratch (useful while working on the schema)"
 	@{
-		WriteLine("Executing rdb", ConsoleColor.Cyan);
+		StartTarget("Rebuild Databases");
 
 		Roundhouse(DEV_CONNECTION_STRING, "DEV", "--drop");
 		Roundhouse(DEV_CONNECTION_STRING, "DEV", "--transaction");
 
 		Roundhouse(TEST_CONNECTION_STRING, "TEST", "--drop");
 		Roundhouse(TEST_CONNECTION_STRING, "TEST", "--transaction");
+
+		FinishTarget("Rebuild Databases");
 	}
 
 #rat description="Running Tests|Run all tests"
 	@{
-		WriteLine("Executing rat", ConsoleColor.Cyan);
+		StartTarget("Run All Tests");
 
 		var commandline = string.Format("/C dnx -p {0} test", TEST_PROJECT_DIR);
 
 		Exec("cmd", commandline);
+
+		FinishTarget("Run All Tests");
 	}
 
 #help description="Help|Displays a list of build commands"
 	@{
-		WriteLine("Executing help", ConsoleColor.Cyan);
 		WriteHelp();
 	}	
 
