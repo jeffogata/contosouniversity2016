@@ -8,6 +8,15 @@ use import="BuildTime"
 functions
 	@{
 		static string PROJECT_NAME = "ContosoUniversity2016";
+		
+		static bool INSTALL_DNX = true;			// allow check to be turned off on build server
+		static string DNX_VERSION = "1.0.0-beta8";
+		static string DNX_RUNTIME = "clr";		// clr, coreclr, mono
+		static string DNX_ARCH = "x86";			// x86, x64, arm
+		static string DNX_OS = "win"; 			// "win", "osx", "darwin", "linux"
+		static string DNX_BASE_DIR_ENV_VAR = "DNX.InstallationDirectory";
+		static string DNX_BASE_DIR = Environment.GetEnvironmentVariable(DNX_BASE_DIR_ENV_VAR) ?? 
+										Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
 
 		static string BASE_DIR = Directory.GetCurrentDirectory();
 		static string SOURCE_DIR = Path.Combine(BASE_DIR, "src");
@@ -20,11 +29,11 @@ functions
 		
 		static string PROJECT_FILE = Path.Combine(SOURCE_DIR, PROJECT_NAME + ".sln");
 
-		static string DEV_CONNECTION_STRING_NAME = string.Join(".", PROJECT_NAME, "ConnectionString");
-		static string TEST_CONNECTION_STRING_NAME = string.Join(".", PROJECT_NAME + ".Tests", "ConnectionString");
-		static string DEV_CONNECTION_STRING = Environment.GetEnvironmentVariable(DEV_CONNECTION_STRING_NAME) ?? 
+		static string DEV_CONNECTION_STRING_ENV_VAR = string.Join(".", PROJECT_NAME, "ConnectionString");
+		static string TEST_CONNECTION_STRING_ENV_VAR = string.Join(".", PROJECT_NAME + ".Tests", "ConnectionString");
+		static string DEV_CONNECTION_STRING = Environment.GetEnvironmentVariable(DEV_CONNECTION_STRING_ENV_VAR) ?? 
 												"Server=localhost;Database=ContosoUniversity2016;Trusted_Connection=True;MultipleActiveResultSets=true";
-		static string TEST_CONNECTION_STRING = Environment.GetEnvironmentVariable(TEST_CONNECTION_STRING_NAME) ?? 
+		static string TEST_CONNECTION_STRING = Environment.GetEnvironmentVariable(TEST_CONNECTION_STRING_ENV_VAR) ?? 
 												"Server=localhost;Database=ContosoUniversity2016.Tests;Trusted_Connection=True;MultipleActiveResultSets=true";
 	}
 
@@ -57,14 +66,44 @@ functions
 		FinishTarget("Clean");
 	}
 
-#restore description="Building|Restore packages for the project"
+#dnx description="Building|Check for and install DNX."
+	@{
+		if (!INSTALL_DNX)
+		{
+			WriteLine("Build is configured to skip DNX installation.", ConsoleColor.DarkCyan);
+			return;
+		}
+
+		StartTarget("DNX");
+
+		// assume if dnx.exe exists that dnx has been installed
+		// dnx runtime directory path will be:  DNX_BASE_DIR\.dnx\runtimes\dnx-clr-win-x86.1.0.0-beta8\bin\dnx.exe
+
+		var dnxDir = string.Format("dnx-{0}-{1}-{2}.{3}", DNX_RUNTIME, DNX_OS, DNX_ARCH, DNX_VERSION);
+		var dnxPath = Path.Combine(DNX_BASE_DIR, ".dnx", "runtimes", dnxDir, "bin", "dnx.exe");
+
+		if (File.Exists(dnxPath))
+		{
+			WriteLine("DNX is already installed.", ConsoleColor.DarkCyan);
+		}
+		else
+		{
+			// todo:  investigate use of -Ngen switch
+			var commandline = string.Format("/C dnvm install {0} -r {1} -a {2} -OS {3} -alias default", DNX_VERSION, DNX_RUNTIME, DNX_ARCH, DNX_OS);
+			Exec("cmd", commandline);
+		}
+
+		FinishTarget("DNX");
+	}
+
+#restore .dnx description="Building|Restore packages for the project"
 	@{
 		StartTarget("Restore");
 		Exec("cmd", "/C dnu restore");
 		FinishTarget("Restore");
 	}
 
-#build .clean .restore description="Building|Build the project"
+#build .dnx .clean .restore description="Building|Build the project"
 	@{
 		StartTarget("Build");
 

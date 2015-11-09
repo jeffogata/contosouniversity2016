@@ -51,5 +51,5 @@ var roundhouseExe = '${Path.Combine(roundhouseDir, "rh")}'
 	options = options + ' --files=' + sqlFilesDir;
 }
 
-exec program='${roundhouseExe}' commandline='${options}' workingdir='${roundhouseDir}'
+exec program='${roundhouseExe}' commandline='${options}' workingdir='${sqlFilesDir}'
 

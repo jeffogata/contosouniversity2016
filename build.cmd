@@ -16,12 +16,8 @@ md .nuget
 copy %CACHED_NUGET% .nuget\nuget.exe > nul
 
 :restore
-IF EXIST packages\Sake goto getdnx
+IF EXIST packages\Sake goto run
 .nuget\NuGet.exe install Sake -ExcludeVersion -Source https://www.nuget.org/api/v2/ -Out packages
-
-:getdnx
-rem echo Installing DNX - 1.0.0-beta8 clr x86
-rem CALL dnvm install 1.0.0-beta8 -runtime CLR -arch x86 -alias default
 
 :run
 echo Building... %1
