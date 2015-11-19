@@ -20,13 +20,16 @@
             modelBuilder.Entity<Department>()
                 .Ignore(x => x.RowVersion);
 
+            modelBuilder.Entity<Person>()
+                .Ignore(x => x.FullName);
+
             modelBuilder.Entity<Student>()
-                .BaseType<Person>();
+                .HasBaseType<Person>();
 
             modelBuilder.Entity<Instructor>()
-                .BaseType<Person>();
+                .HasBaseType<Person>();
 
-            // per this comment, first release of EF7 requires an entity for many-to-many relationships:
+            // per this comment, the first release of EF7 requires an entity for many-to-many relationships:
             // https://github.com/aspnet/EntityFramework/issues/1368#issuecomment-126129034
             // see http://stackoverflow.com/a/29474030/409259
 
@@ -36,7 +39,7 @@
             modelBuilder.Entity<OfficeAssignment>()
                 .HasOne(x => x.Instructor)
                 .WithOne(x => x.OfficeAssignment)
-                .WillCascadeOnDelete();
+                .OnDelete(DeleteBehavior.Cascade);
 
             base.OnModelCreating(modelBuilder);
         }

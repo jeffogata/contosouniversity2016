@@ -3,12 +3,12 @@
     using System.Linq;
     using System.Reflection;
     using MediatR;
-    using Microsoft.Dnx.Runtime;
-    using Microsoft.Framework.DependencyInjection;
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.PlatformAbstractions;
 
-    public static class MediatRExtensions
+    public static class MediatorExtensions
     {
-        public static IServiceCollection AddMediatR(this IServiceCollection services)
+        public static IServiceCollection AddMediator(this IServiceCollection services)
         {
             services.AddScoped<IMediator>(
                 servicesProvider => new Mediator(servicesProvider.GetService, servicesProvider.GetServices));
@@ -36,12 +36,12 @@
             var handlerTypes = assemblies
                 .SelectMany(a => a.DefinedTypes)
                 .Where(typeInfo => !typeInfo.IsAbstract && typeInfo.GetInterfaces().Any(x =>
-                    x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IRequestHandler<,>)));
+                    x.IsGenericType && x.GetGenericTypeDefinition() == typeof (IRequestHandler<,>)));
 
             foreach (var type in handlerTypes)
             {
                 var interfaceType =
-                    type.GetInterfaces().First(x => x.GetGenericTypeDefinition() == typeof(IRequestHandler<,>));
+                    type.GetInterfaces().First(x => x.GetGenericTypeDefinition() == typeof (IRequestHandler<,>));
                 services.AddScoped(interfaceType, type);
             }
 

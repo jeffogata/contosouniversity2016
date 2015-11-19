@@ -5,8 +5,8 @@
     using System.Reflection;
     using AutoMapper;
     using Microsoft.AspNet.Builder;
-    using Microsoft.Dnx.Runtime;
-    using Microsoft.Framework.DependencyInjection;
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.PlatformAbstractions;
 
     public static class AutoMapperBuilder
     {

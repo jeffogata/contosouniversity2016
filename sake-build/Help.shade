@@ -6,155 +6,174 @@ use namespace="System.Collections.Generic"
 use import="Console"
 
 functions
-	@{
-		void WriteHelp()
-		{
-			WriteHelpHeader();
+   @{
+      void WriteHelp()
+      {
+         WriteHelpHeader();
 
-			var groups = GetTargetGroups();
+         var groups = GetTargetGroups();
 
-			WriteHelpGroups(groups);
-			WriteHelpFooter();
-		}
+         WriteHelpGroups(groups);
+         WriteHelpFooter();
+      }
 
-		void WriteHelpHeader()
-		{
-			WriteLine();
-			Write("********************************", ConsoleColor.DarkGreen);
-			Write(" HELP ", ConsoleColor.Green);
-			WriteLine("********************************", ConsoleColor.DarkGreen);
-			WriteLine();
-			Write("This build script has the following common build ");
-			Write("task", ConsoleColor.Green);
-			WriteLine(" aliases set up:");
-		}
+      void WriteHelpHeader()
+      {
+         WriteLine();
+         Write("********************************", ConsoleColor.DarkGreen);
+         Write(" HELP ", ConsoleColor.Green);
+         WriteLine("********************************", ConsoleColor.DarkGreen);
+         WriteLine();
+         Write("This build script has the following build ");
+         Write("targets", ConsoleColor.Green);
+         WriteLine(" set up:");
+      }
 
-		TargetGroups GetTargetGroups()
-		{
-			var groups = new TargetGroups();
+      TargetGroups GetTargetGroups()
+      {
+         var groups = new TargetGroups();
 
-			foreach(var kvp in Targets)
-			{
-				var target = kvp.Value;
+         foreach(var kvp in Targets)
+         {
+            var target = kvp.Value;
+            var tokens = target.Description.Split((char)'|'); 
 
-				// have to cast to char since strings can be delimited by single quotes 
-				// (without the cast, the compiler complains that there is no overload that takes a string)
+            if (tokens.Length == 2)
+            {
+               groups.Add(tokens[0], target.Name, tokens[1]);
+            }
+            else
+            {
+               groups.AddUngrouped(target.Name, target.Description);
+            }
+         }
 
-				var tokens = target.Description.Split((char)'|'); 
+         return groups;
+      }
 
-				switch(tokens.Length)
-				{
-					case 3:
-						groups.Add(tokens[1], tokens[0], tokens[2]);
-						break;
-					case 2:
-						groups.Add(tokens[0], target.Name, tokens[1]);
-						break;
-					default:
-						groups.Add("Ungrouped", target.Name, target.Description);
-						break;
-				}
-			}
+      void WriteHelpGroups(TargetGroups groups)
+      {
+         // write out any ungrouped targets first
+         foreach(var target in groups.UngroupedItems)
+         {
+            WriteLine();
+            Write(" ");
+            Write(target.Name, ConsoleColor.Green);
+            Write(" = ");
+            WriteLine(target.Description);
+         }
 
-			return groups;
-		}
+         // write out groups
+         foreach(var group in groups)
+         {
+            WriteLine();
+            Write(" ");
+            WriteLine(group.Name, ConsoleColor.DarkGreen);
 
-		void WriteHelpGroups(TargetGroups groups)
-		{
-			foreach(var group in groups)
-			{
-				WriteLine();
-				Write(" ");
-				WriteLine(group.Name, ConsoleColor.DarkGreen);
+            foreach(var target in group.Targets)
+            {
+               Write("  > ");
+               Write(target.Name, ConsoleColor.Green);
+               Write(" = ");
+               WriteLine(target.Description);
+            }
+         }
+      }
 
-				foreach(var target in group.Targets)
-				{
-					Write("  > ");
-					Write(target.Name, ConsoleColor.Green);
-					Write(" = ");
-					WriteLine(target.Description);
-				}
-			}
-		}
+      void WriteHelpFooter()
+      {
+         WriteLine();
+         Write(" For a complete list of build targets, view ");
+         Write("makefile.shade", ConsoleColor.Yellow);
+         WriteLine(".");
+         WriteLine();
+         WriteLine("**********************************************************************", ConsoleColor.DarkGreen);
+      }
 
-		void WriteHelpFooter()
-		{
-			WriteLine();
-			WriteLine(" For a complete list of build tasks, view makefile.shade.");
-			WriteLine();
-			WriteLine("**********************************************************************", ConsoleColor.DarkGreen);
-		}
+      public class TargetItem
+      {
+         public TargetItem(string name, string description)
+         {
+            Name = name;
+            Description = description;
+         }
 
-		public class TargetItem
-		{
-			public TargetItem(string name, string description)
-			{
-				Name = name;
-				Description = description;
-			}
-			
-			public string Name { get; private set; }
+         public string Name { get; private set; }
 
-			public string Description { get; private set; }
-		}
+         public string Description { get; private set; }
+      }
 
-		public class TargetGroup
-		{
-			private readonly List<TargetItem> _targets;
+      public class TargetGroup
+      {
+         private readonly List<TargetItem> _targets;
 
-			public TargetGroup(string name) 
-			{
-				_targets = new List<TargetItem>();
-				Name = name;
-			}
+         public TargetGroup(string name) 
+         {
+            _targets = new List<TargetItem>();
+            Name = name;
+         }
 
-			public string Name { get; private set; }
+         public string Name { get; private set; }
 
-			public List<TargetItem> Targets { get { return _targets; } }
+         public List<TargetItem> Targets { get { return _targets; } }
 
-			public TargetItem Add(string name, string description)
-			{
-				var item = new TargetItem(name, description);
-				_targets.Add(item);
-				return item;
-			}
-		}
+         public TargetItem Add(string name, string description)
+         {
+            var item = new TargetItem(name, description);
+            _targets.Add(item);
+            return item;
+         }
+      }
 
-		public class TargetGroups : IEnumerable<TargetGroup>
-		{
-			private readonly Dictionary<string, TargetGroup> _groups;
+      public class TargetGroups : IEnumerable<TargetGroup>
+      {
+         private readonly Dictionary<string, TargetGroup> _groups;
+         private readonly List<TargetItem> _ungrouped;
 
-			public TargetGroups()
-			{
-				_groups = new Dictionary<string, TargetGroup>();				
-			}
+         public TargetGroups()
+         {
+            _groups = new Dictionary<string, TargetGroup>();	
+            _ungrouped = new List<TargetItem>();			
+         }
 
-			public TargetGroup Add(string groupName, string itemName, string itemDescription)
-			{
-				var group = _groups.ContainsKey(groupName) ? _groups[groupName] : null;
-				
-				if (group == null)
-				{
-					group = new TargetGroup(groupName);
-					_groups.Add(group.Name, group);
-				}
-				
-				group.Add(itemName, itemDescription);
-				
-				return group;
-			}
-			
-			System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-			{
-				return this.GetEnumerator();
-			}
-			
-			public IEnumerator<TargetGroup> GetEnumerator()
-			{
-				foreach(var kvp in _groups)
-				{
-					yield return kvp.Value;
-				}
-			}
-		}
-	}
+         public List<TargetItem> UngroupedItems 
+         { 
+            get { return _ungrouped; }
+         }
+
+         public TargetGroup Add(string groupName, string itemName, string itemDescription)
+         {
+            var group = _groups.ContainsKey(groupName) ? _groups[groupName] : null;
+
+            if (group == null)
+            {
+               group = new TargetGroup(groupName);
+               _groups.Add(group.Name, group);
+            }
+
+            group.Add(itemName, itemDescription);
+
+            return group;
+         }
+
+         public TargetItem AddUngrouped(string itemName, string itemDescription)
+         {
+         	var item = new TargetItem(itemName, itemDescription);
+            _ungrouped.Add(item);
+            return item;
+         }
+
+         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+         {
+            return this.GetEnumerator();
+         }
+
+         public IEnumerator<TargetGroup> GetEnumerator()
+         {
+            foreach(var kvp in _groups)
+            {
+               yield return kvp.Value;
+            }
+         }
+      }
+   }

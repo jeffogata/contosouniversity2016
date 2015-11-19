@@ -10,7 +10,7 @@ functions
 		static string PROJECT_NAME = "ContosoUniversity2016";
 		
 		static bool INSTALL_DNX = true;			// allow check to be turned off on build server
-		static string DNX_VERSION = "1.0.0-beta8";
+		static string DNX_VERSION = "1.0.0-rc1-final";
 		static string DNX_RUNTIME = "clr";		// clr, coreclr, mono
 		static string DNX_ARCH = "x86";			// x86, x64, arm
 		static string DNX_OS = "win"; 			// "win", "osx", "darwin", "linux"
@@ -37,7 +37,20 @@ functions
 												"Server=localhost;Database=ContosoUniversity2016.Tests;Trusted_Connection=True;MultipleActiveResultSets=true";
 	}
 
-#default .clean .restore .build .rdb .rat description="(default)|Comprehensive Building|Intended for first build or when you want a fresh, clean local copy"
+#defalult .clean .restore .rdb .rat description="Comprehensive Building|Ensures the environment is initialized:  installs dnx if needed and rebuilds the databases."
+	@{
+		ReportTime();
+
+		WriteLine();
+		Write("*** ", ConsoleColor.Yellow);
+		Write("Execute ", ConsoleColor.Cyan);
+		Write("run.cmd", ConsoleColor.Yellow);
+		Write(" to start the Kestrel server and browse to the site.", ConsoleColor.Cyan);
+		WriteLine(" ***", ConsoleColor.Yellow);
+		WriteLine();
+	}
+
+#full .clean .restore .build .rdb .rat description="Comprehensive Building|Intended for first build or when you want a fresh, clean local copy"
 	@{
 		ReportTime();
 	}
