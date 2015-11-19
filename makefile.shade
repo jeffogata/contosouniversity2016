@@ -37,7 +37,7 @@ functions
 												"Server=localhost;Database=ContosoUniversity2016.Tests;Trusted_Connection=True;MultipleActiveResultSets=true";
 	}
 
-#defalult .clean .restore .rdb .rat description="Comprehensive Building|Ensures the environment is initialized:  installs dnx if needed and rebuilds the databases."
+#defalult .restore .rdb .rat description="Comprehensive Building|Ensures the environment is initialized:  installs dnx if needed and rebuilds the databases."
 	@{
 		ReportTime();
 
