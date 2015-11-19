@@ -112,7 +112,16 @@ functions
 #restore .dnx description="Building|Restore packages for the project"
 	@{
 		StartTarget("Restore");
-		Exec("cmd", "/C dnu restore");
+
+		// when dnx is installed, the -p flag is included, which updates the user path
+		// however these changes are not visible in this session.  to do:  try to refresh
+		// the path variable in this session, then we won't have to rely on this path
+
+		var dnxDir = string.Format("dnx-{0}-{1}-{2}.{3}", DNX_RUNTIME, DNX_OS, DNX_ARCH, DNX_VERSION);
+		var dnuPath = Path.Combine(DNX_BASE_DIR, ".dnx", "runtimes", dnxDir, "bin", "dnu.cmd");
+
+		//Exec("cmd", "/C dnu restore");
+		Exec("cmd", "/C \"" + dnuPath + "\" restore");
 		FinishTarget("Restore");
 	}
 
@@ -154,7 +163,15 @@ functions
 	@{
 		StartTarget("Run All Tests");
 
-		var commandline = string.Format("/C dnx -p {0} test", TEST_PROJECT_DIR);
+		// when dnx is installed, the -p flag is included, which updates the user path
+		// however these changes are not visible in this session.  to do:  try to refresh
+		// the path variable in this session, then we won't have to rely on this path
+
+		var dnxDir = string.Format("dnx-{0}-{1}-{2}.{3}", DNX_RUNTIME, DNX_OS, DNX_ARCH, DNX_VERSION);
+		var dnxPath = Path.Combine(DNX_BASE_DIR, ".dnx", "runtimes", dnxDir, "bin", "dnx.exe");
+
+		//var commandline = string.Format("/C dnx -p {0} test", TEST_PROJECT_DIR);
+		var commandline = string.Format("/C \"" + dnxPath + "\" -p {0} test", TEST_PROJECT_DIR);
 
 		Exec("cmd", commandline);
 
