@@ -4,7 +4,7 @@ for /f "delims=" %%i in ('PowerShell -NoProfile -NoLogo -ExecutionPolicy unrestr
 
 PowerShell -NoProfile -NoLogo -ExecutionPolicy bypass -Command "[System.Threading.Thread]::CurrentThread.CurrentCulture = ''; [System.Threading.Thread]::CurrentThread.CurrentUICulture = '';$CmdPathFile='%DNVM_CMD_PATH_FILE%';& '%~dp0dnvm.ps1' %*"
 
-IF EXIST %DNVM_CMD_PATH_FILE% (
-  CALL %DNVM_CMD_PATH_FILE%
-  DEL %DNVM_CMD_PATH_FILE%
+IF EXIST "%DNVM_CMD_PATH_FILE%" (
+  CALL "%DNVM_CMD_PATH_FILE%"
+  DEL "%DNVM_CMD_PATH_FILE%"
 )
