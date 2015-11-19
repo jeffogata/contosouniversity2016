@@ -102,7 +102,7 @@ functions
 		else
 		{
 			// todo:  investigate use of -Ngen switch
-			var commandline = string.Format("/C dnvm.cmd install {0} -r {1} -a {2} -OS {3} -alias default", DNX_VERSION, DNX_RUNTIME, DNX_ARCH, DNX_OS);
+			var commandline = string.Format("/C dnvm.cmd install {0} -r {1} -a {2} -OS {3} -p -alias default", DNX_VERSION, DNX_RUNTIME, DNX_ARCH, DNX_OS);
 			Exec("cmd", commandline);
 		}
 
