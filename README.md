@@ -24,7 +24,7 @@ You do not need Visual Studio 2015 installed to build and run from the command l
 
 To see more build targets, run `> build.cmd help`.  For more on Sake, see the [sakeproject](https://github.com/sakeproject/sake) and also this work in progress [Sake documentation](http://sake-docs.readthedocs.org/en/latest/).
 
-## Running in Visual Studio 2105
+## Running in Visual Studio 2015
 
 Install the [ASP.NET 5 tooling for VS2015](https://docs.asp.net/en/latest/getting-started/installing-on-windows.html#install-asp-net-5-with-visual-studio).
 
